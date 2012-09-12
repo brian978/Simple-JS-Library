@@ -2,3 +2,93 @@ Simple-JS-Library
 =================
 
 A simple JavaScript library that contains various tools.
+
+Requirements
+------------------------------------------
+jQuery 1.8 or higher
+
+
+Getting started
+------------------------------------------
+
+You need to include the required files in your page head:
+
+<link rel="stylesheet" type="text/css" href="SJL/LoadingScreen/css/loadingscreen.css" />
+<script type="text/javascript" src="SJL/LoadingScreen/loadingscreen.js"></script>
+<script type="text/javascript" src="SJL/DataSender/datasender.js"></script>
+<script type="text/javascript" src="SJL/InfiniteScroll/infinitescroll.js"></script>
+
+
+Usage
+------------------------------------------
+
+InfiniteScroll class
+-----------------------------
+To use the class all you need to do is create the object
+
+var iScroll = new InfiniteScroll({
+    'pullLimit': 250,
+    'container': '#test_contents',
+    'scrollElement': document,
+    'offsetType': 'document',
+    'url': 'someUrl'
+});
+
+
+Options explained:
+-------------------
+pullLimit - The value is in pixels and it is used to determine when the next pull will occur. 250 is the default value and it means that the pull will take place when the user will have at least 250px until the end of the page
+
+container - must be the ID of an element
+
+scrollElement - can be the ID of an element (page the same way as for the "container" parameter) if you want to activate the infinite scroll for an iframe, for example; document or window if you the infinite scroll for the whole page
+
+offsetType - if for the "scrollElement" option you passed an ID, then the value of this option must be "element"; if you passed document or window the value needs to be "document" or "window" depending on your selected option
+
+url - the URL from where the content will be pulled
+
+
+Extra options:
+---------------
+data - a data object with parameters that will be sent via AJAX in POST to the given URL. For example:
+
+var dataObject = {
+    'testParam': '0'
+}
+
+
+Other methods:
+---------------
+If you need to set the data at a later stage use: iScroll.setData(dataObject);
+
+If you want to disable the object so that it will not be triggered on scroll use: iScroll.unbindAll(); this ensures that no object references will remain if you decide to manually delete the object
+
+
+Besides the parameters set in te dataObject, the class will also send a "page" parameter that can be used to determine what to respond to the AJAX call
+
+
+
+
+LoadingScreen class
+-----------------------------
+To use the class all you need to do is create the object
+
+var ls = new LoadingScreen();
+
+and then call the show() method:
+
+ls.show();
+
+
+
+For a more complex set up you have the following options:
+
+opacity - possible values: 0 to 1 (default it is 0.3)
+
+mode - possible values: normal (uses a 48 x 48 image), small (uses a 32 x 32 image), verysmall (uses a 16 x 16 image)
+
+timeout - values must be given in seconds (default it is 20); it is the time before the screen auto destroys
+
+modal - possible values: true or false; when it is set to true it also loads a background to prevent the user from clicking the page; when you use the "normal" mode the default value is true, otherwise it is false
+
+container - the container where the screen will be loaded; by default it is loaded in the body of the page. The value of this option must be either a JavaScript object or a jQuery object of an element
