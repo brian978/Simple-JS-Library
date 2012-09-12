@@ -1,0 +1,86 @@
+.lsContainer{}
+
+/* Container of the loading screen (contains the modal background and the loading image) */
+#Modal.lsContainer{
+    display: block;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 999999;
+}
+
+/* Container of the loading screen (without the modal backgound because it is contained in another element) */
+#Inner.lsContainer{
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+/* Modal backgound of the loading screen */
+.lsContainer #lsBackgound{
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-image: url("../images/lsBackground.png");
+    background-repeat: repeat;
+}
+
+/* Base style for the image */
+.lsImage{
+    float: left;
+    height: 50%;
+}
+
+/* Image container properties depending on image loaded */
+.lsImage.normal{
+    margin-bottom: -24px;
+}
+
+.lsImage.small{
+    margin-bottom: -16px;
+}
+
+.lsImage.verysmall{
+    margin-bottom: -8px;
+}
+
+/* Image shown when loading screen is active */
+#normal{
+    position: relative;
+    clear: both;
+    background-image: url("../images/lsImage.gif");
+    width: 48px;
+    height: 48px;
+    left: 50%;
+    margin-left: -24px;
+}
+
+/* Image shown when loading screen is active (small version with no modal screen) */
+#small{
+    position: relative;
+    clear: both;
+    background-image: url("../images/lsImageSmall.gif");
+    width: 32px;
+    height: 32px;
+    left: 50%;
+    margin-left: -16px;
+}
+
+/* Image shown when loading screen is active (very small version with no modal screen) */
+#verysmall{
+    position: relative;
+    clear: both;
+    background-image: url("../images/lsImageVerySmall.gif");
+    width: 16px;
+    height: 16px;
+    left: 50%;
+    margin-left: -8px;
+}
