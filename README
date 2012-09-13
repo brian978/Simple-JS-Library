@@ -13,14 +13,24 @@ Getting started
 
 You need to include the required files in your page head:
 
-<link rel="stylesheet" type="text/css" href="SJL/LoadingScreen/css/loadingscreen.css" />
-<script type="text/javascript" src="SJL/LoadingScreen/loadingscreen.js"></script>
-<script type="text/javascript" src="SJL/DataSender/datasender.js"></script>
-<script type="text/javascript" src="SJL/InfiniteScroll/infinitescroll.js"></script>
+<script type="text/javascript" src="SJL/DL/dl.js"></script>
 
 
 Usage
 ------------------------------------------
+
+To load the required files use
+<script type="text/javascript">
+    DL.execute();
+</script>
+
+The execute method can also receive a parameter that tells it where is the library
+
+For example if the library is in a "js" folder which resides in the site root you call it like this:
+<script type="text/javascript">
+    DL.execute('js/'); // Note the trailing slash
+</script>
+
 
 InfiniteScroll class
 -----------------------------
