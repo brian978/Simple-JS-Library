@@ -10,19 +10,14 @@
         </script>
     </head>
     <body>
-        <div id="test" style="display: block; width: 200px; height: 200px; border: 1px solid red; margin-left: 100px; margin-top: 100px;">
-
-        </div>
+        <div id="test" style="display: block; width: 200px; height: 200px; border: 1px solid red; margin-left: 100px; margin-top: 100px;"></div>
         <script type="text/javascript">
-            var ls = new LoadingScreen({
-                'opacity': 0.3,
-                'mode': 'normal',
-                'container': $('#test')
-            });
+            var sender = new DataSender({
+                'url': 'http://localhost:8000/ajax.html',
+                'lastAction': true
+            }).execute();
 
-            ls.show();
-
-            new DataSender();
+            setTimeout(function(){ LastAction.execute(); }, 2000);
         </script>
     </body>
 </html>

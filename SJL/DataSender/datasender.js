@@ -42,6 +42,8 @@ function DataSender(params)
         this.params.callFunc = false;
 
     } else {
+
+        // By default the params is an empty array
         if(!isset(this.params.funcParams)){
             this.params.funcParams = new Array();
         }
@@ -57,13 +59,22 @@ function DataSender(params)
         this.params.loadingScreen = true;
     }
 
+    // By default the last Action is not registered
+    if(!isset(this.params.lastAction)) {
+        this.params.lastAction = false;
+    }
+
     /**
      * -----------------------------------------
      * SHORTCUTS WITH DEFAULT VALUES
      * -----------------------------------------
      */
     // URL
-    this.url = this.params.url;
+    if(isset(this.params.url)){
+        this.url = this.params.url;
+    } else {
+        this.url = '';
+    }
 
     // Data
     this.data = new String();
@@ -131,6 +142,12 @@ function DataSender(params)
         },
         success: function(jqXHR){
 
+                // Checking if the last action should be registered
+                if(_this.params.lastAction === true){
+
+                    LastAction.register(_this, 'execute');
+                }
+
                 // Response
                 var response;
 
@@ -139,10 +156,9 @@ function DataSender(params)
 
                     try{
                         response = jQuery.parseJSON(jqXHR);
-
                     } catch (e){}
-                } else{
 
+                } else{
                     response = jqXHR;
                 }
 
