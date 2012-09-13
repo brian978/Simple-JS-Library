@@ -23,14 +23,18 @@ function InfiniteScroll(params){
     // Aliasing the 'this' keyword
     var _this = this;
 
+    // Params
+    if(isset(params)){
+        this.params = params;
+    } else {
+        this.params = new Object();
+    }
+
     // Loading the stuff when the document is ready
     $(document).ready(function(){
 
-        // Params
-        _this.params = params;
-
         // Pull limit - the pull limit is used to determine if the object needs to perform a pull action
-        _this.pullLimit = params.pullLimit || 250;
+        _this.pullLimit = _this.params.pullLimit || 250;
 
         // Page height (determined dynamically)
         _this.pageHeight = 0;
@@ -57,16 +61,16 @@ function InfiniteScroll(params){
         _this.triggered = false;
 
         // Looking for the container parameter
-        if(typeof params.container !== 'undefined'){
+        if(isset(_this.params.container)){
 
             // Container
-            _this.container = $(params.container);
+            _this.container = $(_this.params.container);
 
             // Checking for the scrollElement parameter
-            if(typeof params.scrollElement !== 'undefined'){
+            if(isset(_this.params.scrollElement)){
 
                 // Scrollable element
-                _this.scrollElement = $(params.scrollElement);
+                _this.scrollElement = $(_this.params.scrollElement);
 
                 // Detecting the scroll
                 _this.scrollElement.scroll(function(){
@@ -74,14 +78,14 @@ function InfiniteScroll(params){
                 });
 
                 // Looking for the offsetType
-                if(typeof params.offsetType !== 'undefined'){
+                if(isset(_this.params.offsetType)){
 
                     // Determining the offset
-                    if(params.offsetType === 'document' || params.offsetType === 'window')
+                    if(_this.params.offsetType === 'document' || _this.params.offsetType === 'window')
                     {
                         _this.offsetTop = Math.round(_this.container.offset().top);
                     }
-                    else if (params.offsetType === 'element')
+                    else if (_this.params.offsetType === 'element')
                     {
                         var parentOffset = Math.round(_this.scrollElement.offset().top);
                         var childOffset = Math.round(_this.container.offset().top);
@@ -103,7 +107,7 @@ function InfiniteScroll(params){
     });
 
     // Getting the params
-    if(typeof params !== 'undefined' && typeof params.data === 'undefined' && params !== null){
+    if(!isset(this.params.data)){
         this.params.data = new Object();
     }
 
