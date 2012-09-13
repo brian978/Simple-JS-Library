@@ -21,7 +21,11 @@
 function DataSender(params)
 {
     // Copying the parameter to object property
-    this.params = params;
+    if(isset(params)){
+        this.params = params;
+    } else {
+        this.params = new Object();
+    }
 
     /**
      * --------------------
