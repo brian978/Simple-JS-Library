@@ -8,7 +8,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name LastAction
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -29,6 +29,9 @@ function LastAction(){}
  * @return void
  */
 LastAction.register = function(objInstance, methodName, params){
+
+    // Executed status
+    LastAction.executed = false;
 
     // Object instance
     LastAction.objInstance = objInstance || null;
@@ -53,37 +56,48 @@ LastAction.register = function(objInstance, methodName, params){
  */
 LastAction.execute = function(){
 
-    // Check var
-    var executed = false;
-
     // Waiting for the document to be ready
     $(document).ready(function(){
+        
         // Checking if we have the required parameters
         if(isset(LastAction.methodName)){
 
-            // Default string value
-            var evalStr = LastAction.methodName + '.apply(';
+            // Checking if the last action was executed already or not
+            if(LastAction.executed === false){
 
-            // Checking if the objInstance is set
-            if(isset(LastAction.objInstance)){
-                evalStr = 'LastAction.objInstance.' + evalStr + 'LastAction.objInstance, ';
+                // Default string value
+                var evalStr = LastAction.methodName + '.apply(';
+
+                // Checking if the objInstance is set
+                if(isset(LastAction.objInstance)){
+                    evalStr = 'LastAction.objInstance.' + evalStr + 'LastAction.objInstance, ';
+                } else {
+                    evalStr += 'null, ';
+                }
+
+                // Adding the rest of the elements for the string
+                evalStr += 'LastAction.params);';
+
+                // Logging
+                if(typeof console == 'object'){
+                    console.log(evalStr);
+                }
+
+                // Evaluating the string
+                eval(evalStr);
+
+                // Setting the flag
+                LastAction.executed = true;
+                
             } else {
-                evalStr += 'null, ';
+
+                // Logging
+                if(typeof console == 'object'){
+                    console.log('The last action can only be executed once.');
+                }
+
             }
 
-            // Adding the rest of the elements for the string
-            evalStr += 'LastAction.params);';
-
-            // Logging
-            if(typeof console == 'object'){
-                console.log(evalStr);
-            }
-
-            // Evaluating the string
-            eval(evalStr);
-
-            // Setting the flag
-            executed = true;
         } else {
 
             // Logging
@@ -94,5 +108,5 @@ LastAction.execute = function(){
     });
 
     // Returning the result
-    return executed;
+    return LastAction.executed;
 }
