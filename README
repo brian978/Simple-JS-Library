@@ -102,3 +102,6 @@ timeout - values must be given in seconds (default it is 20); it is the time bef
 modal - possible values: true or false; when it is set to true it also loads a background to prevent the user from clicking the page; when you use the "normal" mode the default value is true, otherwise it is false
 
 container - the container where the screen will be loaded; by default it is loaded in the body of the page. The value of this option must be either a JavaScript object or a jQuery object of an element
+
+
+New documentation coming soon...
