@@ -8,7 +8,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name DataSender
- * @version 1.0
+ * @version 1.1
  *
  */
 
@@ -37,11 +37,23 @@ function DataSender(params)
         this.params.jsonResponse = false;
     }
 
+    // By default no function will inspect the AJAX response
+    if(!isset(this.params.inspectResponse)) {
+        this.params.inspectResponse = false;
+
+    } else if(this.params.inspectResponse === true) {
+
+        // Checking if an inspector function name has been set
+        if(!isset(this.params.inspectorFunc)){
+            this.params.inspectResponse = false;
+        }
+    }
+
     // By default no function is called
     if(!isset(this.params.callFunc)) {
         this.params.callFunc = false;
 
-    } else {
+    } else if(this.params.callFunc === true) {
 
         // Checking if a function name has been set
         if(!isset(this.params.funcName)){
@@ -147,55 +159,71 @@ function DataSender(params)
         },
         success: function(jqXHR){
 
+                // Flag that is used to determine if the response should be further processed
+                var processResponse = true;
+
                 // Checking if the last action should be registered
                 if(_this.params.lastAction === true){
 
                     LastAction.register(_this, 'execute');
                 }
 
-                // Response
-                var response;
+                // Checking if the response should be inspected
+                if(_this.params.inspectResponse === true){
 
-                // Checking if this is a JSON response
-                if(_this.params.jsonResponse === true){
-
-                    try{
-                        response = jQuery.parseJSON(jqXHR);
-                    } catch (e){}
-
-                } else{
-                    response = jqXHR;
+                    // Evaluation string when a function should be called
+                    processResponse = eval(_this.params.inspectorFunc + '(jqXHR)');
                 }
 
-                // Checking if we should call e function and pass it the response
-                if(_this.params.callFunc === true){
+                // Checking the flag
+                if(processResponse === true){
 
-                        // Adding the response to the function params
-                        _this.params.funcParams.push(response);
+                    // Response
+                    var response;
 
-                        // Default string evaluate
-                        var evalStr = '';
+                    // Checking if this is a JSON response
+                    if(_this.params.jsonResponse === true){
 
-                        // Checking if we have an object instance
-                        if(isset(_this.params.objectInstance)){
+                        try{
+                            response = jQuery.parseJSON(jqXHR);
+                        } catch (e){}
 
-                            evalStr = '_this.params.objectInstance.' + _this.params.funcName + '.apply(_this.params.objectInstance, _this.params.funcParams)';
+                    } else{
+                        response = jqXHR;
+                    }
 
-                        } else {
+                    // Checking if we should call e function and pass it the response
+                    if(_this.params.callFunc === true){
 
-                            evalStr = _this.params.funcName + '.apply(null, _this.params.funcParams)';
+                            // Adding the response to the function params
+                            _this.params.funcParams.push(response);
 
-                        }
+                            // Default string evaluate
+                            var evalStr = '';
 
-                        // Calling the function that needs to be triggered
-                        eval(evalStr);
-                }
+                            // Checking if we have an object instance
+                            if(isset(_this.params.objectInstance)){
 
-                // Checking the target container params
-                if(_this.params.targetContainer !== false){
+                                // Evaluation string then an object must be called
+                                evalStr = '_this.params.objectInstance.' + _this.params.funcName + '.apply(_this.params.objectInstance, _this.params.funcParams)';
 
-                    // Addding the response to the target container
-                    _this.params.targetContainer.html(response);
+                            } else {
+
+                                // Evaluation string when a function should be called
+                                evalStr = _this.params.funcName + '.apply(null, _this.params.funcParams)';
+
+                            }
+
+                            // Calling the function that needs to be triggered
+                            eval(evalStr);
+                    }
+
+                    // Checking the target container params
+                    if(_this.params.targetContainer !== false){
+
+                        // Addding the response to the target container
+                        _this.params.targetContainer.html(response);
+                    }
                 }
         },
         error: function(jqXHR, textStatus, errorThrown){
