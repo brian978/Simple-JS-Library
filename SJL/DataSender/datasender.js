@@ -58,7 +58,9 @@ function DataSender(params)
         // Checking if a function name has been set
         if(!isset(this.params.funcName)){
             this.params.callFunc = false;
+
         } else {
+
             // By default the params is an empty array
             if(!isset(this.params.funcParams)){
                 this.params.funcParams = new Array();
