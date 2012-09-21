@@ -151,7 +151,7 @@ function DataSender(params)
         url: this.url,
         type: this.type,
         data: this.data,
-        timeout: (this.params.ajaxTimeout * 1000), // value in milliseconds
+        timeout: (this.timeout * 1000), // value in milliseconds
         beforeSend: function(){
 
             // Showing the loading screen
