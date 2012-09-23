@@ -1,6 +1,6 @@
 /**
  *
- * Simple class that can be used to build a page with infinite scroll
+ * Simple class that can be used to send data via AJAX
  *
  * @author Brian
  * @link https://github.com/brian978

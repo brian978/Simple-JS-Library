@@ -1,6 +1,6 @@
 /**
  *
- * Class that stores the last action than allows you to execute it again
+ * Class that stores the last action and allows you to call it again in case the process gets interrupted
  *
  * @author Brian
  * @link https://github.com/brian978
@@ -58,7 +58,7 @@ LastAction.execute = function(){
 
     // Waiting for the document to be ready
     $(document).ready(function(){
-        
+
         // Checking if we have the required parameters
         if(isset(LastAction.methodName)){
 
@@ -88,7 +88,7 @@ LastAction.execute = function(){
 
                 // Setting the flag
                 LastAction.executed = true;
-                
+
             } else {
 
                 // Logging

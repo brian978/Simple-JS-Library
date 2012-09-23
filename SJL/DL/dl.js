@@ -39,6 +39,7 @@ DL.execute = function(libraryPath){
         'Common': {},
         'LastAction': {},
         'DataSender': {},
+        'DialogCreator': {},
         'LoadingScreen': {
             'css': {
                 0: 'loadingscreen.css'
