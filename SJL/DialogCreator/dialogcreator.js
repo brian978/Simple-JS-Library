@@ -176,8 +176,6 @@ function DialogCreator(params, contents)
                modal: _this.params.modal,
                width: _this.params.dialogWidth,
                height: _this.params.dialogHeight,
-               minWidth: _this.params.dialogWith,
-               minHeight: _this.params.dialogHeight,
                resizable: _this.params.resizable
             });
 
