@@ -240,7 +240,7 @@ function ActionTrigger(params)
                  console.log('Counter at ' + counter);
              }
 
-            this.timeout = setTimeout(function(_this, counter){ _this.timer(counter) }, 1000, this, counter);
+            this.timeout = setTimeout(function(){ _this.timer(counter) }, 1000);
 
         } else if(stateChanged == true){
 
