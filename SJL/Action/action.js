@@ -19,14 +19,14 @@
  * @return void
  */
 function Action(){
-    
+
     /**
      * Used to register the last action
      *
      * @param {Object} objInstance
      * @param {String} methodName
      * @param {Array} params
-     * @return void
+     * @return object
      */
     this.register = function(objInstance, methodName, params){
 
@@ -46,6 +46,8 @@ function Action(){
         if(typeof console == 'object'){
             console.log('Function has been registered. With parameters: ' + this.objInstance + '(objInstance), ' + this.methodName + '(methodName), ' + this.params + '(params)');
         }
+
+        return this;
     }
 
     /**

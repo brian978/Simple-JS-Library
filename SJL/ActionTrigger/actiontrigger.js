@@ -64,43 +64,44 @@ function ActionTrigger(params)
     * @return void
     */
    this.init = function(){
-       
-       // Checking if we have an action object
-       if(this.params.action instanceof Action){
-           
-            // Object of the element
-            this.object = null;
 
-            // Observed object type
-            this.objectType = null;
+        // Checking if we have an action object
+        if(this.params.action instanceof Action){
 
-            // Observed object value
-            this.objectValue = null;
+             // Object of the element
+             this.object = null;
 
-            // Timeout ID
-            this.timeoutId = null;
+             // Observed object type
+             this.objectType = null;
 
-            // Initializing the loading screen variable
-            this.loadScr = (this.params.loadingScreen == true ? new LoadingScreen() : null);
+             // Observed object value
+             this.objectValue = null;
 
-            // Getting the observed object
-            this.getObject();
+             // Timeout ID
+             this.timeoutId = null;
 
-            // Getting the observed object type
-            this.getObjectType();
+             // Initializing the loading screen variable
+             this.loadScr = (this.params.loadingScreen == true ? new LoadingScreen() : null);
 
-            // Getting the initial value of the object value
-            this.getObjectValue();
+             // Getting the observed object
+             this.getObject();
 
-            // Starting the counter
-            this.beginProcess();
-       } else {
+             // Getting the observed object type
+             this.getObjectType();
 
-            // Logging
-            if(typeof console == 'object'){
-                console.log('The ActionTrigger object need an Action object.');
-            }
-       }
+             // Getting the initial value of the object value
+             this.getObjectValue();
+
+             // Starting the counter
+             this.beginProcess();
+
+        } else {
+
+             // Logging
+             if(typeof console == 'object'){
+                 console.log('The ActionTrigger object need an Action object.');
+             }
+        }
    }
 
     /**
@@ -125,10 +126,10 @@ function ActionTrigger(params)
     */
    this.getObjectType = function(){
 
-       // Checking if we have an object
-       if(this.object !== null){
-           this.objectType = new String(this.object.get(0).tagName).toLowerCase();
-       }
+        // Checking if we have an object
+        if(this.object !== null){
+            this.objectType = new String(this.object.get(0).tagName).toLowerCase();
+        }
    }
 
    /**
@@ -142,36 +143,36 @@ function ActionTrigger(params)
         // Object value
         var value = null;
 
-       // Getting the value depending on the object type
-       if(this.objectType == 'div' || this.objectType == 'span' || this.objectType == 'button' || this.objectType == 'textarea'){
+        // Getting the value depending on the object type
+        if(this.objectType == 'div' || this.objectType == 'span' || this.objectType == 'button' || this.objectType == 'textarea'){
 
             value = this.object.html();
 
-       } else if (this.objectType == 'select'){
+        } else if (this.objectType == 'select'){
 
             value = this.object.find('option:selected').val();
-           
-       } else if (this.objectType == 'iframe'){
+
+        } else if (this.objectType == 'iframe'){
 
             /**
              * @TODO get contents of the iframe after it has loaded
              */
             value = this.object.contents().find("body").html();
-            
-       }
 
-       // Checking if the value should be returned
-       if(returnVal == true){
+        }
+
+        // Checking if the value should be returned
+        if(returnVal == true){
 
            return value;
 
-       } else {
+        } else {
 
            this.objectValue = value;
-           
-       }
 
-       return null;
+        }
+
+        return null;
    }
 
    /**
@@ -182,11 +183,21 @@ function ActionTrigger(params)
     */
    this.checkState = function(){
 
-       // Flag
-       var changed = false;
+        // Flag
+        var changed = false;
 
-       // Returning
-       return changed;
+        // Checking the state
+        if(this.getObjectValue(true) != this.objectValue){
+            changed = true;
+
+            // Logging
+            if(typeof console == 'object'){
+                console.log('Object has changed it\'s state.');
+            }
+        }
+
+        // Returning
+        return changed;
    }
 
    /**
@@ -197,17 +208,43 @@ function ActionTrigger(params)
     */
    this.timer = function(counter){
 
-       // Counter variable
-       var counter = counter || 0;
+        // Counter variable
+        var counter = counter || 0;
 
-       // Checking if the counter has reached the limit
-        if(counter < this.params.waitPeriod && this.checkState == false){
+        // Determins if the state has changed
+        var stateChanged = this.checkState();
+
+        // Checking if the counter has reached the limit
+        if(counter < this.params.waitPeriod && stateChanged == false){
 
             counter++;
 
-            this.timeout = setTimeout(function(_this){ _this.timer() }, 1000, this);
-            
+             // Logging
+             if(typeof console == 'object'){
+                 console.log('Counter at ' + counter);
+             }
+
+            this.timeout = setTimeout(function(_this, counter){ _this.timer(counter) }, 1000, this, counter);
+
+        } else if(stateChanged == true){
+
+             // Logging
+             if(typeof console == 'object'){
+                 console.log('The observed object has changed it\'s state. Canceling and triggering action.');
+             }
+
+            // Canceling the loop
+            this.cancel();
+
+             // Triggering the action
+             this.params.action.execute();
+
         } else {
+
+             // Logging
+             if(typeof console == 'object'){
+                 console.log('Operation timed out. The observed object has not changed it\'s state. Canceling...');
+             }
 
             // Canceling the loop
             this.cancel();
@@ -215,20 +252,30 @@ function ActionTrigger(params)
    }
 
    /**
-    * The method starts the counter
+    * The method prepares the requirements to start the timer
     *
     * @param {Void}
     * @return void
     */
    this.beginProcess = function(){
 
-       // Checking if we have a loading screen
-       if(this.loadScr !== null){
-           this.loadScr.show();
-       }
+        // Checking if we have a loading screen
+        if(this.loadScr !== null){
+            this.loadScr.show();
 
-       // Starting the timer
-       this.timer();
+             // Logging
+             if(typeof console == 'object'){
+                 console.log('Loading screen activated.');
+             }
+        }
+
+        // Starting the timer
+        this.timer();
+
+        // Logging
+        if(typeof console == 'object'){
+            console.log('Timer started.');
+        }
    }
 
    /**
@@ -239,15 +286,25 @@ function ActionTrigger(params)
     */
    this.cancel = function(){
 
-       // Checking if we have a loading screen
-       if(this.loadScr !== null){
-           this.loadScr.destroy();
-       }
+        // Checking if we have a loading screen
+        if(this.loadScr !== null){
+            this.loadScr.destroy();
+
+            // Logging
+            if(typeof console == 'object'){
+                console.log('Loading screen destroyed.');
+            }
+        }
 
         // Clearing the timeout ID
         if(this.timeout != null){
 
             clearTimeout(this.timeout);
+        }
+
+        // Logging
+        if(typeof console == 'object'){
+            console.log('Timer canceled.');
         }
    }
 
@@ -263,7 +320,7 @@ function ActionTrigger(params)
             // Initializing
             _this.init();
         });
-        
+
     } else {
 
         // Initializing
