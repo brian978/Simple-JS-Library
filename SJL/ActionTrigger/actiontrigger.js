@@ -86,14 +86,25 @@ function ActionTrigger(params)
              // Getting the observed object
              this.getObject();
 
-             // Getting the observed object type
-             this.getObjectType();
+             // Checking if we have an object
+             if(this.object !== null){
 
-             // Getting the initial value of the object value
-             this.getObjectValue();
+                // Getting the observed object type
+                this.getObjectType();
 
-             // Starting the counter
-             this.beginProcess();
+                // Getting the initial value of the object value
+                this.getObjectValue();
+
+                // Starting the counter
+                this.beginProcess();
+
+             } else {
+
+                // Logging
+                if(typeof console == 'object'){
+                    console.log('Could not find an object with the given ID.');
+                }
+             }
 
         } else {
 
