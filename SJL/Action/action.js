@@ -1,14 +1,14 @@
 /**
  *
- * Class that stores the last action and allows you to call it again in case the process gets interrupted
+ * Class that stores an action and allows you to call it again in case the process gets interrupted
  *
  * @author Brian
  * @link https://github.com/brian978
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
- * @name LastAction
- * @version 1.0.1
+ * @name Action
+ * @version 2.0
  *
  */
 
@@ -18,8 +18,7 @@
  * @param {Void}
  * @return void
  */
-function LastAction(){
-    
+function Action(){
     
     /**
      * Used to register the last action
@@ -50,7 +49,7 @@ function LastAction(){
     }
 
     /**
-     * Executes the last action
+     * Executes the registered action
      *
      * @param {Void}
      * @return boolean
@@ -106,7 +105,7 @@ function LastAction(){
 
                 // Logging
                 if(typeof console == 'object'){
-                    console.log('The LastAction.methodName variable is not set. Value is: ' + _this.methodName);
+                    console.log('The Action.methodName variable is not set. Value is: ' + _this.methodName);
                 }
             }
         });

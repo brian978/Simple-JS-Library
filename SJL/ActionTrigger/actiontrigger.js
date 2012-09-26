@@ -52,6 +52,11 @@ function ActionTrigger(params)
         this.params.waitPeriod = 10;
     }
 
+    // By default we have no LastAction object
+    if(!isset(this.params.action)){
+        this.params.action = null;
+    }
+
    /**
     * The method gets the info about the observed object
     *
@@ -59,33 +64,43 @@ function ActionTrigger(params)
     * @return void
     */
    this.init = function(){
+       
+       // Checking if we have an action object
+       if(this.params.action instanceof Action){
+           
+            // Object of the element
+            this.object = null;
 
-        // Object of the element
-        this.object = null;
+            // Observed object type
+            this.objectType = null;
 
-        // Observed object type
-        this.objectType = null;
+            // Observed object value
+            this.objectValue = null;
 
-        // Observed object value
-        this.objectValue = null;
+            // Timeout ID
+            this.timeoutId = null;
 
-        // Timeout ID
-        this.timeoutId = null;
+            // Initializing the loading screen variable
+            this.loadScr = (this.params.loadingScreen == true ? new LoadingScreen() : null);
 
-        // Initializing the loading screen variable
-        this.loadScr = (this.params.loadingScreen == true ? new LoadingScreen() : null);
+            // Getting the observed object
+            this.getObject();
 
-        // Getting the observed object
-        this.getObject();
+            // Getting the observed object type
+            this.getObjectType();
 
-        // Getting the observed object type
-        this.getObjectType();
+            // Getting the initial value of the object value
+            this.getObjectValue();
 
-        // Getting the initial value of the object value
-        this.getObjectValue();
+            // Starting the counter
+            this.beginProcess();
+       } else {
 
-        // Starting the counter
-        this.beginProcess();
+            // Logging
+            if(typeof console == 'object'){
+                console.log('The ActionTrigger object need an Action object.');
+            }
+       }
    }
 
     /**

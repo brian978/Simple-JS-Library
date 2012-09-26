@@ -37,7 +37,7 @@ DL.execute = function(libraryPath){
     // Array of classes in the library
     var classes = {
         'Common': {},
-        'LastAction': {},
+        'Action': {},
         'DataSender': {},
         'DialogCreator': {},
         'LoadingScreen': {
