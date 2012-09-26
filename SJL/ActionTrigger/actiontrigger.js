@@ -126,6 +126,11 @@ function ActionTrigger(params)
         // Checking if we have and element ID
         if(this.params.elementId !== null){
             this.object = $('#' + this.params.elementId);
+
+            // Checking if an object was found
+            if(this.object.length <= 0){
+                this.object = null;
+            }
         }
     }
 
