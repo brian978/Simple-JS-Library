@@ -175,15 +175,43 @@ function ActionTrigger(params)
    }
 
    /**
+    * Used to check the state of the object
+    *
+    * @param {Void}
+    * @return boolean
+    */
+   this.checkState = function(){
+
+       // Flag
+       var changed = false;
+
+       // Returning
+       return changed;
+   }
+
+   /**
     * The method acts like a timer and checks if the observed object has changed it's value
     *
     * @param {Number} counter
     * @return void
     */
-   this.startTimer = function(counter){
+   this.timer = function(counter){
 
        // Counter variable
        var counter = counter || 0;
+
+       // Checking if the counter has reached the limit
+        if(counter < this.params.waitPeriod && this.checkState == false){
+
+            counter++;
+
+            this.timeout = setTimeout(function(_this){ _this.timer() }, 1000, this);
+            
+        } else {
+
+            // Canceling the loop
+            this.cancel();
+        }
    }
 
    /**
@@ -200,7 +228,7 @@ function ActionTrigger(params)
        }
 
        // Starting the timer
-       this.startTimer();
+       this.timer();
    }
 
    /**

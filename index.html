@@ -11,6 +11,10 @@
             function test(){
                 alert('test function');
             }
+
+            setTimeout(function(){
+                $('#ifr').contents().find('body').html('asdasdsas');
+            }, 2000);
         </script>
     </head>
     <body>
@@ -18,9 +22,9 @@
         <iframe id="ifr" src="ajax.html"></iframe>
         <script type="text/javascript">
             var at = new ActionTrigger({
-                elementId: 'ifr'
+                elementId: 'ifr',
+                action: new Action().register(null, 'test')
             });
         </script>
-
     </body>
 </html>
