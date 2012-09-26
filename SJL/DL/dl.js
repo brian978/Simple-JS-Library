@@ -45,7 +45,8 @@ DL.execute = function(libraryPath){
                 0: 'loadingscreen.css'
             }
         },
-        'InfiniteScroll': {}
+        'InfiniteScroll': {},
+        'ActionTrigger': {}
     };
 
     // Loading the dependencies

@@ -18,95 +18,100 @@
  * @param {Void}
  * @return void
  */
-function LastAction(){}
+function LastAction(){
+    
+    
+    /**
+     * Used to register the last action
+     *
+     * @param {Object} objInstance
+     * @param {String} methodName
+     * @param {Array} params
+     * @return void
+     */
+    this.register = function(objInstance, methodName, params){
 
-/**
- * Used to register the last action
- *
- * @param {Object} objInstance
- * @param {String} methodName
- * @param {Array} params
- * @return void
- */
-LastAction.register = function(objInstance, methodName, params){
+        // Executed status
+        this.executed = false;
 
-    // Executed status
-    LastAction.executed = false;
+        // Object instance
+        this.objInstance = objInstance || null;
 
-    // Object instance
-    LastAction.objInstance = objInstance || null;
+        // Method name
+        this.methodName = methodName || null;
 
-    // Method name
-    LastAction.methodName = methodName || null;
+        // Params
+        this.params = params || new Array();
 
-    // Params
-    LastAction.params = params || new Array();
-
-    // Logging
-    if(typeof console == 'object'){
-        console.log('Function has been registered. With parameters: ' + LastAction.objInstance + '(objInstance), ' + LastAction.methodName + '(methodName), ' + LastAction.params + '(params)');
+        // Logging
+        if(typeof console == 'object'){
+            console.log('Function has been registered. With parameters: ' + this.objInstance + '(objInstance), ' + this.methodName + '(methodName), ' + this.params + '(params)');
+        }
     }
-}
 
-/**
- * Executes the last action
- *
- * @param {Void}
- * @return boolean
- */
-LastAction.execute = function(){
+    /**
+     * Executes the last action
+     *
+     * @param {Void}
+     * @return boolean
+     */
+    this.execute = function(){
 
-    // Waiting for the document to be ready
-    $(document).ready(function(){
+        // Aliasing the 'this' keyword
+        var _this = this;
 
-        // Checking if we have the required parameters
-        if(isset(LastAction.methodName)){
+        // Waiting for the document to be ready
+        $(document).ready(function(){
 
-            // Checking if the last action was executed already or not
-            if(LastAction.executed === false){
+            // Checking if we have the required parameters
+            if(isset(_this.methodName)){
 
-                // Default string value
-                var evalStr = LastAction.methodName + '.apply(';
+                // Checking if the last action was executed already or not
+                if(_this.executed === false){
 
-                // Checking if the objInstance is set
-                if(isset(LastAction.objInstance)){
-                    evalStr = 'LastAction.objInstance.' + evalStr + 'LastAction.objInstance, ';
+                    // Default string value
+                    var evalStr = _this.methodName + '.apply(';
+
+                    // Setting the object instance
+                    if(isset(_this.objInstance)){
+                        evalStr = '_this.objInstance.' + evalStr + '_this.objInstance, ';
+                    } else {
+                        evalStr += 'null, ';
+                    }
+
+                    // Adding the rest of the elements for the string
+                    evalStr += '_this.params);';
+
+                    // Logging
+                    if(typeof console == 'object'){
+                        console.log(evalStr);
+                    }
+
+                    // Evaluating the string
+                    eval(evalStr);
+
+                    // Setting the flag
+                    _this.executed = true;
+
                 } else {
-                    evalStr += 'null, ';
+
+                    // Logging
+                    if(typeof console == 'object'){
+                        console.log('The last action can only be executed once.');
+                    }
+
                 }
-
-                // Adding the rest of the elements for the string
-                evalStr += 'LastAction.params);';
-
-                // Logging
-                if(typeof console == 'object'){
-                    console.log(evalStr);
-                }
-
-                // Evaluating the string
-                eval(evalStr);
-
-                // Setting the flag
-                LastAction.executed = true;
 
             } else {
 
                 // Logging
                 if(typeof console == 'object'){
-                    console.log('The last action can only be executed once.');
+                    console.log('The LastAction.methodName variable is not set. Value is: ' + _this.methodName);
                 }
-
             }
+        });
 
-        } else {
-
-            // Logging
-            if(typeof console == 'object'){
-                console.log('The LastAction.methodName variable is not set. Value is: ' + LastAction.methodName);
-            }
-        }
-    });
-
-    // Returning the result
-    return LastAction.executed;
+        // Returning the result
+        return _this.executed;
+    }
 }
