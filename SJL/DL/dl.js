@@ -38,6 +38,7 @@ DL.execute = function(libraryPath){
     var classes = {
         'Common': {},
         'Action': {},
+		'LastAction': {},
         'DataSender': {},
         'DialogCreator': {},
         'LoadingScreen': {
