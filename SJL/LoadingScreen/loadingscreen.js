@@ -131,7 +131,7 @@ function LoadingScreen(params){
      * Loading screen show method
      *
      * @param {Void}
-     * @return void
+     * @return LoadingScreen
      */
     this.show = function(){
 
@@ -196,6 +196,8 @@ function LoadingScreen(params){
                 _this.checkTimeout();
             }
         });
+
+        return this;
     }
 
     /**
