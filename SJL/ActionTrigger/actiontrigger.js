@@ -52,7 +52,7 @@ function ActionTrigger(params)
         this.params.waitPeriod = 10;
     }
 
-    // By default we have no LastAction object
+    // By default we have no Action object
     if(!isset(this.params.action)){
         this.params.action = null;
     }
