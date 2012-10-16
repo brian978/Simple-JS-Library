@@ -253,7 +253,9 @@ function ActionTrigger(params)
             this.cancel();
 
              // Triggering the action
-             this.params.action.execute();
+             if(this.params.action !== null){
+                 this.params.action.execute();
+             }
 
         } else {
 
