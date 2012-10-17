@@ -24,11 +24,7 @@ function InfiniteScroll(params){
     var _this = this;
 
     // Params
-    if(isset(params)){
-        this.params = params;
-    } else {
-        this.params = new Object();
-    }
+    this.params = params || new Object();
 
     // Loading the stuff when the document is ready
     $(document).ready(function(){

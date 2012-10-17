@@ -20,12 +20,8 @@
  */
 function ActionTrigger(params)
 {
-    // Copying the parameter to object property
-    if(isset(params)){
-        this.params = params;
-    } else {
-        this.params = new Object();
-    }
+    // Params
+    this.params = params || new Object();
 
     /**
      * --------------------
