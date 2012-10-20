@@ -47,7 +47,8 @@ DL.execute = function(libraryPath){
             }
         },
         'InfiniteScroll': {},
-        'ActionTrigger': {}
+        'ActionTrigger': {},
+        'HashHandler': {}
     };
 
     // Loading the dependencies
