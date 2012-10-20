@@ -108,6 +108,19 @@ function HashHandler(){
     }
 
     /**
+     * Removes all the values of the hash
+     *
+     * @param {Void}
+     * @return this
+     */
+    this.reset = function(){
+
+        this.values = new Array();
+
+        return this;
+    }
+
+    /**
      * Changes the entire hash
      *
      * @param {Void}
