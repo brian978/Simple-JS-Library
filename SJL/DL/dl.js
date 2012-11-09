@@ -37,6 +37,7 @@ DL.execute = function(libraryPath){
     // Array of classes in the library
     var classes = {
         'Common': {},
+        'jQueryPlugins': {},
         'Action': {},
 		'LastAction': {},
         'DataSender': {},
