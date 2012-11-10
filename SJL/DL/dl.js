@@ -8,7 +8,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name DependencyLoader
- * @version 1.0
+ * @version 1.3
  *
  */
 
@@ -29,7 +29,7 @@ function DL(){}
 DL.execute = function(libraryPath){
 
     // Setting a default libraryPath if not set
-    var libraryPath = libraryPath || '';
+    var libPath = libraryPath || '';
 
     // Getting the head element object
     var container = $('head');
@@ -95,7 +95,7 @@ DL.execute = function(libraryPath){
             // Adding attributes
             link.setAttribute('rel', 'stylesheet');
             link.setAttribute('type', 'text/css');
-            link.setAttribute('href', libraryPath + 'SJL/' + className + '/css/' + css[index]);
+            link.setAttribute('href', libPath + 'SJL/' + className + '/css/' + css[index]);
 
             // Adding the element to the container
             container.append(link);
@@ -111,7 +111,7 @@ DL.execute = function(libraryPath){
 
         // Adding attributes
         script.setAttribute('type', 'text/javascript');
-        script.setAttribute('src', libraryPath + 'SJL/' + className + '/' + classFilename);
+        script.setAttribute('src', libPath + 'SJL/' + className + '/' + classFilename);
 
         // Adding the element to the container
         container.append(script);
