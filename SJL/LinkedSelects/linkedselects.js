@@ -20,8 +20,6 @@ function LinkedSelects(params)
 {
     this.params     = params || new Object();
     this.links      = new Array();
-    this.options    = new Array();
-    this.indexes    = new Array();
 
     /**
      * Initializes the object
@@ -54,14 +52,6 @@ function LinkedSelects(params)
         // If the elements are not present we do nothing
         if(parentElement !== null && childElement !== null)
         {
-            // Initializing the options array for each element
-            this.options[elements.parent] = new Array();
-            this.options[elements.child]  = new Array();
-
-            // Initializing the indexes array for each element
-            this.indexes[elements.parent] = new Array();
-            this.indexes[elements.child]  = new Array();
-
             // Linking the elements
             this.links[elements.parent] = childElement;
             this.links[elements.child]  = parentElement;
@@ -106,50 +96,81 @@ function LinkedSelects(params)
         var optionInnerHtml = e.target.innerHTML;
         var optionValue     = e.target.getAttribute('value');
 
-        if(optionInnerHtml.trim() != '' && optionValue.trim() != ''){
+        if(optionValue !== null && optionInnerHtml.trim() != '' && optionValue.trim() != ''){
 
-            var option        = document.createElement('option');
             var selectedIndex = element.selectedIndex;
             var elementId     = element.getAttribute('id');
             var destElement   = this.links[elementId];
-            var destId        = destElement.getAttribute('id');
             var scrollTop     = destElement.scrollTop;
-            var selectedAttrs = this.getAttributes(e.target);
-
-            // Adding info to the new options
-            option.innerHTML = optionInnerHtml;
-
-            // Moving the attributes
-            for(var nodeName in selectedAttrs){
-                option.setAttribute(nodeName, selectedAttrs[nodeName]);
-            }
 
             // Removing the selected index from the select box
             element.remove(selectedIndex);
 
-            // Remembering where the element came from
-            this.indexes[elementId][optionValue] = selectedIndex;
-
             // Checking if we know were to move the element
-            if(isset(this.indexes[destId][optionValue]))
-            {
-                destElement.insertBefore(option, destElement.options[this.indexes[destId][optionValue]]);
-            }
-            else
-            {
-                destElement.appendChild(option);
-            }
+            destElement.appendChild(this.createOption(optionInnerHtml, this.getAttributes(e.target)));
+
+            // Sorting the options of the destination elements
+            this.sortOptions(destElement);
 
             // Setting the scroll bar where it should be
             destElement.scrollTop = scrollTop;
 
             // Logging
             if(typeof console === 'object'){
-                console.log('Links: ' + this.indexes.toSource());
-                console.log('Selected index is: ' + selectedIndex);
-                console.log('Destination index is: ' + this.indexes[destId][optionValue]);
             }
         }
+    }
+
+    /**
+     * Sorts the options of an element
+     *
+     * @param {Object} selectBox
+     * @return void
+     */
+    this.sortOptions = function(selectBox){
+
+        var options  = new Array();
+        var sortable = new Array();
+        var text     = null;
+
+        for(var i in selectBox.options){
+            if(!isNaN(i)){
+                text = selectBox.options[i].innerHTML;
+                options[text] = this.getAttributes(selectBox.options[i]);
+                sortable[i]   = text;
+            }
+        }
+
+        // Sorting
+        sortable.sort();
+
+        // Rebuilding the option list
+        for(var i in sortable){
+            text = sortable[i];
+            selectBox.options[i] = this.createOption(text, options[text]);
+        }
+    }
+
+    /**
+     * Creates an option element using the given data
+     *
+     * @param {String} text
+     * @param {Array} attributes
+     * @return object
+     */
+    this.createOption = function(text, attributes){
+
+        var option = document.createElement('option');
+
+        // Adding info to the new options
+        option.innerHTML = text;
+
+        // Moving the attributes
+        for(var nodeName in attributes){
+            option.setAttribute(nodeName, attributes[nodeName]);
+        }
+
+        return option;
     }
 
     /**
@@ -170,5 +191,19 @@ function LinkedSelects(params)
         }
 
         return attributes;
+    }
+
+    /**
+     * Determins if an element is a parent
+     *
+     * @param {Object} element
+     * @return boolean
+     */
+    this.isParent = function(element){
+        if(isset(this.parents[element.getAttribute('id')])){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
