@@ -8,7 +8,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name DependencyLoader
- * @version 1.3
+ * @version 1.0
  *
  */
 
@@ -49,7 +49,8 @@ DL.execute = function(libraryPath){
         },
         'InfiniteScroll': {},
         'ActionTrigger': {},
-        'HashHandler': {}
+        'HashHandler': {},
+        'LinkedSelects': {}
     };
 
     // Loading the dependencies
