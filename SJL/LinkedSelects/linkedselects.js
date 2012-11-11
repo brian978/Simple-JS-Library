@@ -94,9 +94,8 @@ function LinkedSelects(params)
     this.processClick = function(e, element){
 
         var optionInnerHtml = e.target.innerHTML;
-        var optionValue     = e.target.getAttribute('value');
 
-        if(optionValue !== null && optionInnerHtml.trim() != '' && optionValue.trim() != ''){
+        if(optionInnerHtml.trim() != ''){
 
             var selectedIndex = element.selectedIndex;
             var elementId     = element.getAttribute('id');
@@ -191,19 +190,5 @@ function LinkedSelects(params)
         }
 
         return attributes;
-    }
-
-    /**
-     * Determins if an element is a parent
-     *
-     * @param {Object} element
-     * @return boolean
-     */
-    this.isParent = function(element){
-        if(isset(this.parents[element.getAttribute('id')])){
-            return true;
-        } else {
-            return false;
-        }
     }
 }
