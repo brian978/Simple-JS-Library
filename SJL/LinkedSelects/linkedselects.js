@@ -51,24 +51,28 @@ function LinkedSelects(params)
         var parentElement = document.getElementById(elements.parent);
         var childElement  = document.getElementById(elements.child);
 
-        // Initializing the options array for each element
-        this.options[elements.parent] = new Array();
-        this.options[elements.child]  = new Array();
+        // If the elements are not present we do nothing
+        if(parentElement !== null && childElement !== null)
+        {
+            // Initializing the options array for each element
+            this.options[elements.parent] = new Array();
+            this.options[elements.child]  = new Array();
 
-        // Initializing the indexes array for each element
-        this.indexes[elements.parent] = new Array();
-        this.indexes[elements.child]  = new Array();
+            // Initializing the indexes array for each element
+            this.indexes[elements.parent] = new Array();
+            this.indexes[elements.child]  = new Array();
 
-        // Linking the elements
-        this.links[elements.parent] = childElement;
-        this.links[elements.child]  = parentElement;
+            // Linking the elements
+            this.links[elements.parent] = childElement;
+            this.links[elements.child]  = parentElement;
 
-        // Replacing the elements with the objects
-        elements.parent = parentElement;
-        elements.child  = childElement;
+            // Replacing the elements with the objects
+            elements.parent = parentElement;
+            elements.child  = childElement;
 
-        // Setting the events
-        this.setupEvents(elements);
+            // Setting the events
+            this.setupEvents(elements);
+        }
     }
 
     /**
