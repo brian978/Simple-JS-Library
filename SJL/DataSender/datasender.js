@@ -241,6 +241,7 @@ function DataSender(params)
 
                 action = new Action().register(_this.params.objectInstance, _this.params.funcName, _this.params.funcParams);
             }
+            
         } else {
 
             // Addding the response to the params
