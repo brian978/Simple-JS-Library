@@ -44,10 +44,33 @@ function Action(){
 
         // Logging
         if(typeof console == 'object'){
-            console.log('Function has been registered. With parameters: ' + this.objInstance + '(objInstance), ' + this.methodName + '(methodName), ' + this.params + '(params)');
+            console.log('Function has been registered');
+//            console.log('Parameters: ' + this.objInstance + '(objInstance), ' + this.methodName + '(methodName), ' + this.params + '(params)');
         }
 
         return this;
+    }
+
+    /**
+     * Changes the params
+     *
+     * @param {Array} params
+     * @return void
+     */
+    this.set = function(params){
+        if(typeof params !== 'undefined'){
+            this.params = params;
+        }
+    }
+
+    /**
+     * Gets the params
+     *
+     * @param {Void}
+     * @return void
+     */
+    this.get = function(){
+        return this.params;
     }
 
     /**

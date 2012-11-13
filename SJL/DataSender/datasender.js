@@ -45,22 +45,21 @@ function DataSender(params)
         }
     }
 
-    // By default no function is called
-    if(!isset(this.params.callFunc)) {
-        this.params.callFunc = false;
+    // Checking if a function name has been set
+    if(!isset(this.params.objectInstance)){
+        this.params.objectInstance = null;
 
-    } else if(this.params.callFunc === true) {
+    }
 
-        // Checking if a function name has been set
-        if(!isset(this.params.funcName)){
-            this.params.callFunc = false;
+    // Checking if a function name has been set
+    if(!isset(this.params.funcName)){
+        this.params.funcName = null;
 
-        } else {
+    } else {
 
-            // By default the params is an empty array
-            if(!isset(this.params.funcParams)){
-                this.params.funcParams = new Array();
-            }
+        // By default the params is an empty array
+        if(!isset(this.params.funcParams)){
+            this.params.funcParams = new Array();
         }
     }
 
@@ -77,6 +76,11 @@ function DataSender(params)
     // By default the last Action is not registered
     if(!isset(this.params.lastAction)) {
         this.params.lastAction = false;
+    }
+
+    // By default the last Action is not registered
+    if(!isset(this.params.postReceiveAction)) {
+        this.params.postReceiveAction = null;
     }
 
     /**
@@ -125,7 +129,7 @@ function DataSender(params)
      * @param {Void}
      * @return void
      */
-    this.execute = function (){
+    this.execute = function(){
 
         // Aliasing the 'this' keyword
         var _this = this;
@@ -190,31 +194,8 @@ function DataSender(params)
                         response = jqXHR;
                     }
 
-                    // Checking if we should call e function and pass it the response
-                    if(_this.params.callFunc === true){
-
-                            // Adding the response to the function params
-                            _this.params.funcParams.push(response);
-
-                            // Default string evaluate
-                            var evalStr = '';
-
-                            // Checking if we have an object instance
-                            if(isset(_this.params.objectInstance)){
-
-                                // Evaluation string then an object must be called
-                                evalStr = '_this.params.objectInstance.' + _this.params.funcName + '.apply(_this.params.objectInstance, _this.params.funcParams)';
-
-                            } else {
-
-                                // Evaluation string when a function should be called
-                                evalStr = _this.params.funcName + '.apply(null, _this.params.funcParams)';
-
-                            }
-
-                            // Calling the function that needs to be triggered
-                            eval(evalStr);
-                    }
+                    // Executing a post receive action if there is one
+                    _this.executePostReceiveAction(response);
 
                     // Checking the target container params
                     if(_this.params.targetContainer !== false){
@@ -236,5 +217,32 @@ function DataSender(params)
                 loadScreen.destroy();
             }
         }});
+    }
+
+    /**
+     * Executes and action
+     *
+     * @param {String} response
+     * @return void
+     */
+    this.executePostReceiveAction = function(response){
+
+        var action = this.params.postReceiveAction;
+
+        if(action === null){
+
+            var _this = this;
+
+            // Checking if we should call e function and pass it the response
+            if(_this.params.funcName !== null){
+
+                // Adding the response to the function params
+                _this.params.funcParams.push(response);
+
+                action = new Action().register(_this.params.objectInstance, _this.params.funcName, _this.params.funcParams);
+            }
+        }
+
+        action.execute();
     }
 }
