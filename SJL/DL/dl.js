@@ -39,7 +39,7 @@ DL.execute = function(libraryPath){
         'Common': {},
         'jQueryPlugins': {},
         'Action': {},
-		'LastAction': {},
+        'LastAction': {},
         'DataSender': {},
         'DialogCreator': {},
         'LoadingScreen': {
