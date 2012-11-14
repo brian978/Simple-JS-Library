@@ -245,11 +245,11 @@ function DataSender(params)
         } else {
 
             // Addding the response to the params
-            var params = action.get();
-            params.push(response);
-            action.set(params);
+            action.set(action.get().push(response));
         }
 
-        action.execute();
+        if(action !== null){
+            action.execute();
+        }
     }
 }
