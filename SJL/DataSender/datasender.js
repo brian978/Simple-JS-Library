@@ -245,7 +245,9 @@ function DataSender(params)
         } else {
 
             // Addding the response to the params
-            action.set(action.get().push(response));
+            var params = action.get();
+            params.push(response);
+            action.set(params);
         }
 
         if(action !== null){
