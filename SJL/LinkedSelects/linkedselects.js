@@ -6,7 +6,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name LinkedSelects
- * @version 1.0
+ * @version 1.2
  *
  */
 
@@ -46,8 +46,8 @@ function LinkedSelects(params)
     this.linkSelects = function(elements){
 
         // Getting the element objects
-        var parentElement = document.getElementById(elements.parent);
-        var childElement  = document.getElementById(elements.child);
+        var parentElement = $('#' + elements.parent);
+        var childElement  = $('#' + elements.child);
 
         // If the elements are not present we do nothing
         if(parentElement !== null && childElement !== null)
@@ -75,48 +75,42 @@ function LinkedSelects(params)
 
         var _this = this;
 
-        elements.parent.addEventListener('dblclick', function(e){
-            _this.processClick(e, elements.parent);
+        elements.parent.bind('dblclick', function(){
+            _this.processClick(elements.parent);
         });
 
-        elements.child.addEventListener('dblclick', function(e){
-            _this.processClick(e, elements.child);
+        elements.child.bind('dblclick', function(){
+            _this.processClick(elements.child);
         });
     }
 
     /**
      * Processes the click action
      *
-     * @param {Object} e
      * @param {Object} element
      * @return void
      */
-    this.processClick = function(e, element){
+    this.processClick = function(element){
 
-        var optionInnerHtml = e.target.innerHTML;
+        var selectedOption  = $(element).find('option:selected');
+        var optionInnerHtml = selectedOption.html();
 
         if(optionInnerHtml.trim() != ''){
 
-            var selectedIndex = element.selectedIndex;
-            var elementId     = element.getAttribute('id');
-            var destElement   = this.links[elementId];
-            var scrollTop     = destElement.scrollTop;
+            var linkedElement = this.links[element.attr('id')];
+            var scrollTop     = linkedElement.scrollTop();
 
             // Removing the selected index from the select box
-            element.remove(selectedIndex);
+            selectedOption.remove();
 
             // Checking if we know were to move the element
-            destElement.appendChild(this.createOption(optionInnerHtml, this.getAttributes(e.target)));
+            linkedElement.append(this.createOption(optionInnerHtml, this.getAttributes(selectedOption)));
 
             // Sorting the options of the destination elements
-            this.sortOptions(destElement);
+            this.sortOptions(linkedElement);
 
             // Setting the scroll bar where it should be
-            destElement.scrollTop = scrollTop;
-
-            // Logging
-            if(typeof console === 'object'){
-            }
+            linkedElement.scrollTop(scrollTop);
         }
     }
 
@@ -128,25 +122,28 @@ function LinkedSelects(params)
      */
     this.sortOptions = function(selectBox){
 
-        var options  = new Array();
-        var sortable = new Array();
-        var text     = null;
+        var attributes  = new Array();
+        var sortable    = new Array();
+        var text        = null;
+        var _this       = this;
+        var options     = selectBox.find('option');
+        var option      = null
 
-        for(var i in selectBox.options){
-            if(!isNaN(i)){
-                text = selectBox.options[i].innerHTML;
-                options[text] = this.getAttributes(selectBox.options[i]);
-                sortable[i]   = text;
-            }
-        }
+        options.each(function(index){
+            option       = $(this);
+            text             = option.html();
+            attributes[text] = _this.getAttributes(option);
+            sortable[index]  = text;
+        });
 
         // Sorting
         sortable.sort();
 
         // Rebuilding the option list
         for(var i in sortable){
-            text = sortable[i];
-            selectBox.options[i] = this.createOption(text, options[text]);
+            text   = sortable[i];
+            option = $(options.get(i));
+            option.html(text);
         }
     }
 
@@ -159,14 +156,12 @@ function LinkedSelects(params)
      */
     this.createOption = function(text, attributes){
 
-        var option = document.createElement('option');
-
-        // Adding info to the new options
-        option.innerHTML = text;
+        // Creating the option
+        var option = $('<option>' + text + '</option>');
 
         // Moving the attributes
         for(var nodeName in attributes){
-            option.setAttribute(nodeName, attributes[nodeName]);
+            option.attr(nodeName, attributes[nodeName]);
         }
 
         return option;
@@ -180,13 +175,14 @@ function LinkedSelects(params)
      */
     this.getAttributes = function(element){
 
-        var nodeMap     = element.attributes;
+        var nodeMap     = element[0].attributes;
         var attributes  = new Array();
 
         for(var i=0; i < nodeMap.length; i++){
-            var item = nodeMap.item(i);
 
-            attributes[item.nodeName] = item.nodeValue;
+            // The item is an object from the map
+            var item                    = nodeMap.item(i);
+            attributes[item.nodeName]   = item.nodeValue;
         }
 
         return attributes;
