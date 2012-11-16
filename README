@@ -103,5 +103,7 @@ modal - possible values: true or false; when it is set to true it also loads a b
 
 container - the container where the screen will be loaded; by default it is loaded in the body of the page. The value of this option must be either a JavaScript object or a jQuery object of an element
 
+Usage documentation
+-----------------------------
 
-New documentation coming soon...
+https://brian.hopto.org/wiki/github_repos/category/simple-js-library/

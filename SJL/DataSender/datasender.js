@@ -250,6 +250,8 @@ function DataSender(params)
             action.set(params);
         }
 
-        action.execute();
+        if(action !== null){
+            action.execute();
+        }
     }
 }
