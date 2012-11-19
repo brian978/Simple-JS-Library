@@ -21,9 +21,13 @@ function LinkedSelects(params)
     // Closure
     var _this = this;
 
-    this.params     = params || new Object();
-    this.links      = new Array();
-    this.buttons    = new Array(); // Holds the links between the buttons and the selects
+    this.params  = params || new Object();
+
+    // Links between the selects Array( selectId => linkedSelectObj )
+    this.links   = new Array();
+
+    // Holds the links between the buttons and the selects Array( buttonId => linkedSelectObj )
+    this.buttons = new Array();
 
     /**
      * Initializes the object
@@ -96,37 +100,24 @@ function LinkedSelects(params)
      */
     this.setupButtons = function(buttons, elements){
 
-        // Getting the element objects
-        var fromParentButton = $('#' + buttons.parent);
-        var fromChildButton  = $('#' + buttons.child);
+        // Getting the button objects
+        var parentButton = $('#' + buttons.parent);
+        var childButton  = $('#' + buttons.child);
 
         // If the elements are not present we do nothing
-        if(isset(fromParentButton) && isset(fromChildButton))
+        if(isset(parentButton) && isset(parentButton))
         {
-            // Linking the elements
+            // Linking the buttons to the elements they target
             _this.buttons[buttons.parent] = elements.parent;
             _this.buttons[buttons.child]  = elements.child;
 
             // Replacing the elements with the objects
-            buttons.parent = fromParentButton;
-            buttons.child  = fromChildButton;
+            buttons.parent = parentButton;
+            buttons.child  = childButton;
 
-            // Processing the all buttons
-            if(isset(buttons.parentAll)){
-                var parentAll = $('#' + buttons.parentAll);
-
-                if(isset(parentAll)){
-                    buttons.parentAll = parentAll;
-                }
-            }
-
-            if(isset(buttons.childAll)){
-                var childAll = $('#' + buttons.childAll);
-
-                if(isset(childAll)){
-                    buttons.childAll = childAll;
-                }
-            }
+            // We check if they actually exist in the setupButtonsEvents method
+            buttons.parentAll = $('#' + buttons.parentAll);
+            buttons.childAll  = $('#' + buttons.childAll);
 
             // Logging
             if(typeof console == 'object'){
@@ -191,14 +182,14 @@ function LinkedSelects(params)
         });
 
         // Event for the parent all
-        if(isset(buttons.parentAll)){
+        if(isset(buttons.parentAll) && buttons.parentAll instanceof jQuery){
             buttons.parentAll.bind('click', function(){
                 _this.processClick(_this.buttons[parentId], 'option', false);
             });
         }
 
         // Event for the child all
-        if(isset(buttons.childAll)){
+        if(isset(buttons.childAll) && buttons.childAll instanceof jQuery){
             buttons.childAll.bind('click', function(){
                 _this.processClick(_this.buttons[childId], 'option', false);
             });

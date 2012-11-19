@@ -36,7 +36,6 @@ function DataSender(params)
     // By default no function will inspect the AJAX response
     if(!isset(this.params.inspectResponse)) {
         this.params.inspectResponse = false;
-
     } else if(this.params.inspectResponse === true) {
 
         // Checking if an inspector function name has been set
@@ -54,7 +53,6 @@ function DataSender(params)
     // Checking if a function name has been set
     if(!isset(this.params.funcName)){
         this.params.funcName = null;
-
     } else {
 
         // By default the params is an empty array
@@ -83,6 +81,11 @@ function DataSender(params)
         this.params.postReceiveAction = null;
     }
 
+    // By default the last Action is not registered
+    if(!isset(this.params.data) || this.params.data instanceof Object == false) {
+        this.params.data = new Object();
+    }
+
     /**
      * -----------------------------------------
      * SHORTCUTS WITH DEFAULT VALUES
@@ -95,33 +98,11 @@ function DataSender(params)
         this.url = '';
     }
 
-    // Data
-    this.data = new String();
-
     // Type
     this.type = typeof this.params.type !== 'undefined' ? this.params.type : "POST";
 
     // Timeout
     this.timeout = typeof this.params.timeout !== 'undefined' ? this.params.timeout : 20; // Seconds
-
-    /**
-     * -----------------------
-     * REQUEST DATA PROCESS
-     * -----------------------
-     */
-    // Building the data for the submit
-    for(var index in this.params.data){
-
-        // Adding the data to the data string
-        this.data += index + '=' + this.params.data[index] + '&';
-    }
-
-    // Checking the data string
-    if(this.data.length > 0){
-
-        // Removing the last "&" sign
-        this.data.substr(0, this.data.length-1);
-    }
 
     /**
      * Makes the request
@@ -150,7 +131,7 @@ function DataSender(params)
         $.ajax({
         url: this.url,
         type: this.type,
-        data: this.data,
+        data: this.params.data,
         timeout: (this.timeout * 1000), // value in milliseconds
         beforeSend: function(){
 
@@ -241,7 +222,7 @@ function DataSender(params)
 
                 action = new Action().register(_this.params.objectInstance, _this.params.funcName, _this.params.funcParams);
             }
-            
+
         } else {
 
             // Addding the response to the params
