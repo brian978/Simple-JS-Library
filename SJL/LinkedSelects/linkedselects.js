@@ -111,6 +111,23 @@ function LinkedSelects(params)
             buttons.parent = fromParentButton;
             buttons.child  = fromChildButton;
 
+            // Processing the all buttons
+            if(isset(buttons.parentAll)){
+                var parentAll = $('#' + buttons.parentAll);
+
+                if(isset(parentAll)){
+                    buttons.parentAll = parentAll;
+                }
+            }
+
+            if(isset(buttons.childAll)){
+                var childAll = $('#' + buttons.childAll);
+
+                if(isset(childAll)){
+                    buttons.childAll = childAll;
+                }
+            }
+
             // Logging
             if(typeof console == 'object'){
                 console.log('Initialized the buttons');
@@ -173,6 +190,20 @@ function LinkedSelects(params)
             _this.processClick(_this.buttons[childId]);
         });
 
+        // Event for the parent all
+        if(isset(buttons.parentAll)){
+            buttons.parentAll.bind('click', function(){
+                _this.processClick(_this.buttons[parentId], 'option', false);
+            });
+        }
+
+        // Event for the child all
+        if(isset(buttons.childAll)){
+            buttons.childAll.bind('click', function(){
+                _this.processClick(_this.buttons[childId], 'option', false);
+            });
+        }
+
         // Logging
         if(typeof console == 'object'){
             console.log('Button events have been set up for "' + parentId + '" and "' + childId + '"');
@@ -183,18 +214,25 @@ function LinkedSelects(params)
      * Processes the click action
      *
      * @param {Object} element
+     * @param {String} findWhat
+     * @param {Boolean} doSort
      * @return void
      */
-    this.processClick = function(element){
+    this.processClick = function(element, findWhat, doSort){
 
-        $(element).find('option:selected').each(function(){
+        var linkedElement   = _this.links[element.attr('id')];
+        var find            = findWhat || 'option:selected';
+        var sort            = isset(doSort) ? doSort : true;
+        var moved           = false;
+
+        $(element).find(find).each(function(){
+
             var selectedOption  = $(this);
             var optionInnerHtml = selectedOption.html();
 
             if(optionInnerHtml.trim() != ''){
 
-                var linkedElement = _this.links[element.attr('id')];
-                var scrollTop     = linkedElement.scrollTop();
+                var scrollTop = linkedElement.scrollTop();
 
                 // Removing the selected index from the select box
                 selectedOption.remove();
@@ -202,13 +240,18 @@ function LinkedSelects(params)
                 // Checking if we know were to move the element
                 linkedElement.append(_this.createOption(optionInnerHtml, _this.getAttributes(selectedOption)));
 
-                // Sorting the options of the destination elements
-                _this.sortOptions(linkedElement);
-
                 // Setting the scroll bar where it should be
                 linkedElement.scrollTop(scrollTop);
+
+                // Flag so that we do the sorting only once
+                moved = true;
             }
         });
+
+        // Sorting the options of the destination elements
+        if(moved === true && sort === true){
+            _this.sortOptions(linkedElement);
+        }
     }
 
     /**
