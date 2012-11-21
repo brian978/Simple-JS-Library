@@ -6,7 +6,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name LinkedSelects
- * @version 1.3
+ * @version 1.4
  *
  */
 
@@ -154,6 +154,18 @@ function LinkedSelects(params)
             _this.processClick(elements.child);
         });
 
+        // For visual feedback we need to remove the selected options of a select box
+        // when the focus is on the other select box
+        elements.parent.bind('focus', function(){
+            elements.child.find('option:selected').removeAttr('selected');
+        });
+
+        // For visual feedback we need to remove the selected options of a select box
+        // when the focus is on the other select box
+        elements.child.bind('focus', function(){
+            elements.parent.find('option:selected').removeAttr('selected');
+        });
+
         // Logging
         if(typeof console == 'object'){
             console.log('Double click events have been set up for "' + elements.parent.attr('id') + '" and "' + elements.child.attr('id') + '"');
@@ -233,6 +245,9 @@ function LinkedSelects(params)
 
                 // Setting the scroll bar where it should be
                 linkedElement.scrollTop(scrollTop);
+
+                // For a little visual feedback we focus on the select where we moved the elements
+                linkedElement.focus();
 
                 // Flag so that we do the sorting only once
                 moved = true;
