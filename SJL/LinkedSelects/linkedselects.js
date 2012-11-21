@@ -62,8 +62,8 @@ function LinkedSelects(params)
         if(isset(parentElement) && isset(childElement))
         {
             // Linking the elements
-            _this.links[elements.parent] = childElement;
-            _this.links[elements.child]  = parentElement;
+            this.links[elements.parent] = childElement;
+            this.links[elements.child]  = parentElement;
 
             // Replacing the elements with the objects
             elements.parent = parentElement;
@@ -75,11 +75,11 @@ function LinkedSelects(params)
             }
 
             // Setting the events
-            _this.setupEvents(elements);
+            this.setupEvents(elements);
 
             // Setting the buttons
-            if(isset(_this.params.buttons[index])){
-                _this.setupButtons(_this.params.buttons[index], elements);
+            if(isset(this.params.buttons[index])){
+                this.setupButtons(this.params.buttons[index], elements);
             }
         }
         else
@@ -108,8 +108,8 @@ function LinkedSelects(params)
         if(isset(parentButton) && isset(parentButton))
         {
             // Linking the buttons to the elements they target
-            _this.buttons[buttons.parent] = elements.parent;
-            _this.buttons[buttons.child]  = elements.child;
+            this.buttons[buttons.parent] = elements.parent;
+            this.buttons[buttons.child]  = elements.child;
 
             // Replacing the elements with the objects
             buttons.parent = parentButton;
@@ -125,7 +125,7 @@ function LinkedSelects(params)
             }
 
             // Setting the events
-            _this.setupButtonEvents(buttons);
+            this.setupButtonEvents(buttons);
         }
         else
         {
@@ -223,7 +223,7 @@ function LinkedSelects(params)
      */
     this.processClick = function(element, findWhat, doSort){
 
-        var linkedElement   = _this.links[element.attr('id')];
+        var linkedElement   = this.links[element.attr('id')];
         var find            = findWhat || 'option:selected';
         var sort            = isset(doSort) ? doSort : true;
         var moved           = false;
@@ -256,7 +256,7 @@ function LinkedSelects(params)
 
         // Sorting the options of the destination elements
         if(moved === true && sort === true){
-            _this.sortOptions(linkedElement);
+            this.sortOptions(linkedElement);
         }
     }
 
