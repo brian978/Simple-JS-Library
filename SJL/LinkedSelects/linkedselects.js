@@ -6,7 +6,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name LinkedSelects
- * @version 1.0
+ * @version 1.4
  *
  */
 
@@ -18,8 +18,16 @@
  */
 function LinkedSelects(params)
 {
-    this.params     = params || new Object();
-    this.links      = new Array();
+    // Closure
+    var _this = this;
+
+    this.params  = params || new Object();
+
+    // Links between the selects Array( selectId => linkedSelectObj )
+    this.links   = new Array();
+
+    // Holds the links between the buttons and the selects Array( buttonId => linkedSelectObj )
+    this.buttons = new Array();
 
     /**
      * Initializes the object
@@ -28,29 +36,30 @@ function LinkedSelects(params)
      * @return void
      */
     this.init = function(){
-        if(isset(this.params.selects[0])){
-            for(var i in this.params.selects){
-                this.linkSelects(this.params.selects[i]);
+        $(document).ready(function(){
+            if(isset(_this.params.selects[0])){
+                for(var i in _this.params.selects){
+                    _this.linkSelects(_this.params.selects[i], i);
+                }
             }
-        } else {
-            this.linkSelects(this.params.selects);
-        }
+        });
     }
 
     /**
      * Links 2 select boxes
      *
      * @param {Object} elements
+     * @param {Integer} index
      * @return void
      */
-    this.linkSelects = function(elements){
+    this.linkSelects = function(elements, index){
 
         // Getting the element objects
-        var parentElement = document.getElementById(elements.parent);
-        var childElement  = document.getElementById(elements.child);
+        var parentElement = $('#' + elements.parent);
+        var childElement  = $('#' + elements.child);
 
         // If the elements are not present we do nothing
-        if(parentElement !== null && childElement !== null)
+        if(isset(parentElement) && isset(childElement))
         {
             // Linking the elements
             this.links[elements.parent] = childElement;
@@ -60,8 +69,70 @@ function LinkedSelects(params)
             elements.parent = parentElement;
             elements.child  = childElement;
 
+            // Logging
+            if(typeof console == 'object'){
+                console.log('Initialized the select boxes');
+            }
+
             // Setting the events
             this.setupEvents(elements);
+
+            // Setting the buttons
+            if(isset(this.params.buttons[index])){
+                this.setupButtons(this.params.buttons[index], elements);
+            }
+        }
+        else
+        {
+            // Logging
+            if(typeof console == 'object'){
+                console.log('Failed to initialize the select boxes (make sure they exist)');
+            }
+        }
+    }
+
+    /**
+     * Adds the buttons for the select boxes
+     *
+     * @param {Object} buttons
+     * @param {Object} elements
+     * @return void
+     */
+    this.setupButtons = function(buttons, elements){
+
+        // Getting the button objects
+        var parentButton = $('#' + buttons.parent);
+        var childButton  = $('#' + buttons.child);
+
+        // If the elements are not present we do nothing
+        if(isset(parentButton) && isset(parentButton))
+        {
+            // Linking the buttons to the elements they target
+            this.buttons[buttons.parent] = elements.parent;
+            this.buttons[buttons.child]  = elements.child;
+
+            // Replacing the elements with the objects
+            buttons.parent = parentButton;
+            buttons.child  = childButton;
+
+            // We check if they actually exist in the setupButtonsEvents method
+            buttons.parentAll = $('#' + buttons.parentAll);
+            buttons.childAll  = $('#' + buttons.childAll);
+
+            // Logging
+            if(typeof console == 'object'){
+                console.log('Initialized the buttons');
+            }
+
+            // Setting the events
+            this.setupButtonEvents(buttons);
+        }
+        else
+        {
+            // Logging
+            if(typeof console == 'object'){
+                console.log('Failed to initialize the buttons (make sure they exist)');
+            }
         }
     }
 
@@ -73,50 +144,119 @@ function LinkedSelects(params)
      */
     this.setupEvents = function(elements){
 
-        var _this = this;
-
-        elements.parent.addEventListener('dblclick', function(e){
-            _this.processClick(e, elements.parent);
+        // Event for the parent select
+        elements.parent.bind('dblclick', function(){
+            _this.processClick(elements.parent);
         });
 
-        elements.child.addEventListener('dblclick', function(e){
-            _this.processClick(e, elements.child);
+        // Event for the child select
+        elements.child.bind('dblclick', function(){
+            _this.processClick(elements.child);
         });
+
+        // For visual feedback we need to remove the selected options of a select box
+        // when the focus is on the other select box
+        elements.parent.bind('focus', function(){
+            elements.child.find('option:selected').removeAttr('selected');
+        });
+
+        // For visual feedback we need to remove the selected options of a select box
+        // when the focus is on the other select box
+        elements.child.bind('focus', function(){
+            elements.parent.find('option:selected').removeAttr('selected');
+        });
+
+        // Logging
+        if(typeof console == 'object'){
+            console.log('Double click events have been set up for "' + elements.parent.attr('id') + '" and "' + elements.child.attr('id') + '"');
+        }
+    }
+
+    /**
+     * Sets up the event handlers for the buttons
+     *
+     * @param {Object} buttons
+     * @return void
+     */
+    this.setupButtonEvents = function(buttons){
+
+        var parentId = buttons.parent.attr('id');
+        var childId  = buttons.child.attr('id');
+
+        // Event for the parent btn
+        buttons.parent.bind('click', function(){
+            _this.processClick(_this.buttons[parentId]);
+        });
+
+        // Event for the child btn
+        buttons.child.bind('click', function(){
+            _this.processClick(_this.buttons[childId]);
+        });
+
+        // Event for the parent all
+        if(isset(buttons.parentAll) && buttons.parentAll instanceof jQuery){
+            buttons.parentAll.bind('click', function(){
+                _this.processClick(_this.buttons[parentId], 'option', false);
+            });
+        }
+
+        // Event for the child all
+        if(isset(buttons.childAll) && buttons.childAll instanceof jQuery){
+            buttons.childAll.bind('click', function(){
+                _this.processClick(_this.buttons[childId], 'option', false);
+            });
+        }
+
+        // Logging
+        if(typeof console == 'object'){
+            console.log('Button events have been set up for "' + parentId + '" and "' + childId + '"');
+        }
     }
 
     /**
      * Processes the click action
      *
-     * @param {Object} e
      * @param {Object} element
+     * @param {String} findWhat
+     * @param {Boolean} doSort
      * @return void
      */
-    this.processClick = function(e, element){
+    this.processClick = function(element, findWhat, doSort){
 
-        var optionInnerHtml = e.target.innerHTML;
+        var linkedElement   = this.links[element.attr('id')];
+        var find            = findWhat || 'option:selected';
+        var sort            = isset(doSort) ? doSort : true;
+        var moved           = false;
 
-        if(optionInnerHtml.trim() != ''){
+        $(element).find(find).each(function(){
 
-            var selectedIndex = element.selectedIndex;
-            var elementId     = element.getAttribute('id');
-            var destElement   = this.links[elementId];
-            var scrollTop     = destElement.scrollTop;
+            var selectedOption  = $(this);
+            var optionInnerHtml = selectedOption.html();
 
-            // Removing the selected index from the select box
-            element.remove(selectedIndex);
+            if(optionInnerHtml.trim() != ''){
 
-            // Checking if we know were to move the element
-            destElement.appendChild(this.createOption(optionInnerHtml, this.getAttributes(e.target)));
+                var scrollTop = linkedElement.scrollTop();
 
-            // Sorting the options of the destination elements
-            this.sortOptions(destElement);
+                // Removing the selected index from the select box
+                selectedOption.remove();
 
-            // Setting the scroll bar where it should be
-            destElement.scrollTop = scrollTop;
+                // Checking if we know were to move the element
+                linkedElement.append(_this.createOption(optionInnerHtml, _this.getAttributes(selectedOption)));
 
-            // Logging
-            if(typeof console === 'object'){
+                // Setting the scroll bar where it should be
+                linkedElement.scrollTop(scrollTop);
+
+                // For a little visual feedback we focus on the select where we moved the elements
+                linkedElement.focus();
+
+                // Flag so that we do the sorting only once
+                moved = true;
             }
+        });
+
+        // Sorting the options of the destination elements
+        if(moved === true && sort === true){
+            this.sortOptions(linkedElement);
         }
     }
 
@@ -128,25 +268,33 @@ function LinkedSelects(params)
      */
     this.sortOptions = function(selectBox){
 
-        var options  = new Array();
-        var sortable = new Array();
-        var text     = null;
+        var attributes  = new Array();
+        var sortable    = new Array();
+        var text        = null;
+        var options     = selectBox.find('option');
+        var option      = null
 
-        for(var i in selectBox.options){
-            if(!isNaN(i)){
-                text = selectBox.options[i].innerHTML;
-                options[text] = this.getAttributes(selectBox.options[i]);
-                sortable[i]   = text;
-            }
-        }
+        options.each(function(index){
+            option           = $(this);
+            text             = option.html();
+            attributes[text] = _this.getAttributes(option);
+            sortable[index]  = text;
+        });
 
         // Sorting
         sortable.sort();
 
         // Rebuilding the option list
         for(var i in sortable){
-            text = sortable[i];
-            selectBox.options[i] = this.createOption(text, options[text]);
+            text   = sortable[i];
+            option = $(options.get(i));
+            option.html(text);
+        }
+
+        // Logging
+        if(typeof console == 'object'){
+            console.log('Sorting the elements in the select box with ID "' + selectBox.attr('id') + '"');
+            console.log('##############################################################################');
         }
     }
 
@@ -159,14 +307,12 @@ function LinkedSelects(params)
      */
     this.createOption = function(text, attributes){
 
-        var option = document.createElement('option');
-
-        // Adding info to the new options
-        option.innerHTML = text;
+        // Creating the option
+        var option = $('<option>' + text + '</option>');
 
         // Moving the attributes
         for(var nodeName in attributes){
-            option.setAttribute(nodeName, attributes[nodeName]);
+            option.attr(nodeName, attributes[nodeName]);
         }
 
         return option;
@@ -180,13 +326,14 @@ function LinkedSelects(params)
      */
     this.getAttributes = function(element){
 
-        var nodeMap     = element.attributes;
+        var nodeMap     = element[0].attributes;
         var attributes  = new Array();
 
         for(var i=0; i < nodeMap.length; i++){
-            var item = nodeMap.item(i);
 
-            attributes[item.nodeName] = item.nodeValue;
+            // The item is an object from the map
+            var item                    = nodeMap.item(i);
+            attributes[item.nodeName]   = item.nodeValue;
         }
 
         return attributes;
