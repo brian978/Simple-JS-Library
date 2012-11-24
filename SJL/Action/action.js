@@ -8,7 +8,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name Action
- * @version 2.0
+ * @version 2.1
  *
  */
 
@@ -60,6 +60,10 @@ function Action(){
     this.set = function(params){
         if(typeof params !== 'undefined'){
             this.params = params;
+
+            // If the parameters have changed then the action could have different outcome
+            // so we need to reset the executed status
+            this.reset();
         }
     }
 
@@ -71,6 +75,16 @@ function Action(){
      */
     this.get = function(){
         return this.params;
+    }
+
+    /**
+     * Resets the executed flag
+     *
+     * @param {Void}
+     * @return void
+     */
+    this.reset = function(){
+        this.executed = false;
     }
 
     /**
