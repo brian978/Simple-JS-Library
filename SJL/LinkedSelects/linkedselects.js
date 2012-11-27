@@ -70,7 +70,7 @@ function LinkedSelects(params)
             elements.child  = childElement;
 
             // Logging
-            if(typeof console == 'object' && isMozilla()){
+            if(logMessages()){
                 console.log('Initialized the select boxes');
             }
 
@@ -85,7 +85,7 @@ function LinkedSelects(params)
         else
         {
             // Logging
-            if(typeof console == 'object' && isMozilla()){
+            if(logMessages()){
                 console.log('Failed to initialize the select boxes (make sure they exist)');
             }
         }
@@ -120,7 +120,7 @@ function LinkedSelects(params)
             buttons.childAll  = $('#' + buttons.childAll);
 
             // Logging
-            if(typeof console == 'object' && isMozilla()){
+            if(logMessages()){
                 console.log('Initialized the buttons');
             }
 
@@ -130,7 +130,7 @@ function LinkedSelects(params)
         else
         {
             // Logging
-            if(typeof console == 'object' && isMozilla()){
+            if(logMessages()){
                 console.log('Failed to initialize the buttons (make sure they exist)');
             }
         }
@@ -167,7 +167,7 @@ function LinkedSelects(params)
         });
 
         // Logging
-        if(typeof console == 'object' && isMozilla()){
+        if(logMessages()){
             console.log('Double click events have been set up for "' + elements.parent.attr('id') + '" and "' + elements.child.attr('id') + '"');
         }
     }
@@ -208,7 +208,7 @@ function LinkedSelects(params)
         }
 
         // Logging
-        if(typeof console == 'object' && isMozilla()){
+        if(logMessages()){
             console.log('Button events have been set up for "' + parentId + '" and "' + childId + '"');
         }
     }
@@ -292,7 +292,7 @@ function LinkedSelects(params)
         }
 
         // Logging
-        if(typeof console == 'object' && isMozilla()){
+        if(logMessages()){
             console.log('Sorting the elements in the select box with ID "' + selectBox.attr('id') + '"');
             console.log('##############################################################################');
         }

@@ -78,3 +78,27 @@ function isMozilla()
 
     return isMozilla.result;
 }
+
+/**
+ * Determins if the scripts should log any messages
+ *
+ * @param {Void}
+ * @return void
+ */
+function logMessages()
+{
+    if(typeof console == 'object'
+        && isMozilla()
+        && (
+            (
+                isset(window.enableLogging)
+                && window.enableLogging === true
+            )
+            || !isset(window.enableLogging)
+        )
+    ){
+        return true;
+    } else {
+        return false;
+    }
+}
