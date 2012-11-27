@@ -63,3 +63,18 @@ function is_numeric(n)
     // ==== result ==== //
     return result;
 }
+
+/**
+ * Determins if the browser is Mozilla (uses jQuery)
+ *
+ * @param {Void}
+ * @return boolean
+ */
+function isMozilla()
+{
+    if(typeof isMozilla.result == 'undefined'){
+        isMozilla.result = $.browser.mozilla;
+    }
+
+    return isMozilla.result;
+}

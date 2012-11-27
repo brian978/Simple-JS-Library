@@ -97,7 +97,7 @@ function ActionTrigger(params)
              } else {
 
                 // Logging
-                if(typeof console == 'object'){
+                if(typeof console == 'object' && isMozilla()){
                     console.log('Could not find an object with the given ID.');
                 }
              }
@@ -105,7 +105,7 @@ function ActionTrigger(params)
         } else {
 
              // Logging
-             if(typeof console == 'object'){
+             if(typeof console == 'object' && isMozilla()){
                  console.log('The ActionTrigger object need an Action object.');
              }
         }
@@ -203,7 +203,7 @@ function ActionTrigger(params)
             changed = true;
 
             // Logging
-            if(typeof console == 'object'){
+            if(typeof console == 'object' && isMozilla()){
                 console.log('Object has changed it\'s state.');
             }
         }
@@ -232,7 +232,7 @@ function ActionTrigger(params)
             counter++;
 
              // Logging
-             if(typeof console == 'object'){
+             if(typeof console == 'object' && isMozilla()){
                  console.log('Counter at ' + counter);
              }
 
@@ -241,7 +241,7 @@ function ActionTrigger(params)
         } else if(stateChanged == true){
 
              // Logging
-             if(typeof console == 'object'){
+             if(typeof console == 'object' && isMozilla()){
                  console.log('The observed object has changed it\'s state. Canceling and triggering action.');
              }
 
@@ -256,7 +256,7 @@ function ActionTrigger(params)
         } else {
 
              // Logging
-             if(typeof console == 'object'){
+             if(typeof console == 'object' && isMozilla()){
                  console.log('Operation timed out. The observed object has not changed it\'s state. Canceling...');
              }
 
@@ -278,7 +278,7 @@ function ActionTrigger(params)
             this.loadScr.show();
 
              // Logging
-             if(typeof console == 'object'){
+             if(typeof console == 'object' && isMozilla()){
                  console.log('Loading screen activated.');
              }
         }
@@ -287,7 +287,7 @@ function ActionTrigger(params)
         this.timer();
 
         // Logging
-        if(typeof console == 'object'){
+        if(typeof console == 'object' && isMozilla()){
             console.log('Timer started.');
         }
    }
@@ -305,7 +305,7 @@ function ActionTrigger(params)
             this.loadScr.destroy();
 
             // Logging
-            if(typeof console == 'object'){
+            if(typeof console == 'object' && isMozilla()){
                 console.log('Loading screen destroyed.');
             }
         }
@@ -317,7 +317,7 @@ function ActionTrigger(params)
         }
 
         // Logging
-        if(typeof console == 'object'){
+        if(typeof console == 'object' && isMozilla()){
             console.log('Timer canceled.');
         }
    }
