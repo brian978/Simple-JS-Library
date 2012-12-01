@@ -43,7 +43,7 @@ function Action(){
         this.params = params || new Array();
 
         // Logging
-        if(typeof console == 'object'){
+        if(logMessages()){
             console.log('Function has been registered');
 //            console.log('Parameters: ' + this.objInstance + '(objInstance), ' + this.methodName + '(methodName), ' + this.params + '(params)');
         }
@@ -121,7 +121,7 @@ function Action(){
                     evalStr += '_this.params);';
 
                     // Logging
-                    if(typeof console == 'object'){
+                    if(logMessages()){
                         console.log(evalStr);
                     }
 
@@ -134,7 +134,7 @@ function Action(){
                 } else {
 
                     // Logging
-                    if(typeof console == 'object'){
+                    if(logMessages()){
                         console.log('The last action can only be executed once.');
                     }
 
@@ -143,7 +143,7 @@ function Action(){
             } else {
 
                 // Logging
-                if(typeof console == 'object'){
+                if(logMessages()){
                     console.log('The Action.methodName variable is not set. Value is: ' + _this.methodName);
                 }
             }
