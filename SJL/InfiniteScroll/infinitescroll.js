@@ -206,7 +206,7 @@ function InfiniteScroll(params){
             var computedPullLimit = this.contentHeight - this.pageHeight - this.scrollPosition;
 
             // Logging
-            if(typeof console == 'object'){
+            if(logMessages()){
                 console.log(this.contentHeight + ' - ' + this.pageHeight + ' - ' + this.scrollPosition + ' = ' + computedPullLimit);
                 console.log('this.offsetTop: ' + this.offsetTop);
             }
