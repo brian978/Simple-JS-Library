@@ -26,6 +26,19 @@ function InfiniteScroll(params){
     // Params
     this.params = params || new Object();
 
+    // By default no function will inspect the AJAX response
+    if(!isset(this.params.inspectResponse))
+    {
+        this.params.inspectResponse = false;
+    }
+    else if(this.params.inspectResponse === true)
+    {
+        // Checking if an inspector function name has been set
+        if(!isset(this.params.inspectorFunc)){
+            this.params.inspectResponse = false;
+        }
+    }
+
     // Loading the stuff when the document is ready
     $(document).ready(function(){
 
@@ -101,11 +114,6 @@ function InfiniteScroll(params){
             alert('The InfiniteScroll object requires a "container" parameter, which was not found in the "params" parameter passed to it.');
         }
     });
-
-    // Getting the params
-    if(!isset(this.params.data)){
-        this.params.data = new Object();
-    }
 
     /**
      * Sets the data
@@ -236,15 +244,18 @@ function InfiniteScroll(params){
 
             // Creating the AjaxCaller object
             var sender = new DataSender({
-                'url': this.params.url,
-                'callFunc': true,
-                'objectInstance': this,
-                'funcName': 'pullContent',
-                'loadingScreen': false,
-                'data': this.params.data
-            }).execute();
+                url:                this.params.url,
+                postReceiveAction:  new Action(_this, 'pullContent'),
+                loadingScreen:      false,
+                data:               this.params.data,
+                inspectResponse:    this.params.inspectResponse,
+                inspectorFunc:      this.params.inspectorFunc
+            });
 
-            // Deleting the object
+            // Sending the request
+            sender.execute();
+
+            // Deleting the object so it doesn't remain after the trigger
             sender = null;
             delete sender;
 
