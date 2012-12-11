@@ -51,11 +51,6 @@ function ActionTrigger(params)
         this.params.action = null;
     }
 
-    // Loading the stuff when the document is ready
-    $(document).ready(function(){
-        _this.init();
-    });
-
    /**
     * The method gets the info about the observed object
     *
