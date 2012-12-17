@@ -20,6 +20,9 @@
  */
 function ActionTrigger(params)
 {
+    // Aliasing the 'this' keyword
+    var _this = this;
+
     // Params
     this.params = params || new Object();
 
@@ -31,11 +34,6 @@ function ActionTrigger(params)
     // Checking if we have an element ID
     if(!isset(this.params.elementId)){
         this.params.elementId = null;
-    }
-
-    // Checking if the methods that determine the objects state should be triggered after the document has loaded or not
-    if(!isset(this.params.documentReady)){
-        this.params.documentReady = true;
     }
 
     // By default the class triggers a loading screen
@@ -321,23 +319,4 @@ function ActionTrigger(params)
             console.log('Timer canceled.');
         }
    }
-
-    // Checking the document ready flag
-    if(this.params.documentReady == true){
-
-        // Aliasing the 'this' keyword
-        var _this = this;
-
-        // Getting the initial value of the object value
-        $(document).ready(function(){
-
-            // Initializing
-            _this.init();
-        });
-
-    } else {
-
-        // Initializing
-        this.init();
-    }
 }

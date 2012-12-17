@@ -34,10 +34,12 @@ function DataSender(params)
     }
 
     // By default no function will inspect the AJAX response
-    if(!isset(this.params.inspectResponse)) {
+    if(!isset(this.params.inspectResponse))
+    {
         this.params.inspectResponse = false;
-    } else if(this.params.inspectResponse === true) {
-
+    }
+    else if(this.params.inspectResponse === true)
+    {
         // Checking if an inspector function name has been set
         if(!isset(this.params.inspectorFunc)){
             this.params.inspectResponse = false;
@@ -47,14 +49,15 @@ function DataSender(params)
     // Checking if a function name has been set
     if(!isset(this.params.objectInstance)){
         this.params.objectInstance = null;
-
     }
 
     // Checking if a function name has been set
-    if(!isset(this.params.funcName)){
+    if(!isset(this.params.funcName))
+    {
         this.params.funcName = null;
-    } else {
-
+    }
+    else
+    {
         // By default the params is an empty array
         if(!isset(this.params.funcParams)){
             this.params.funcParams = new Array();
