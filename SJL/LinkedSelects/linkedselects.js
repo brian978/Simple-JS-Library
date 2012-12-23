@@ -78,7 +78,7 @@ function LinkedSelects(params)
             this.setupEvents(elements);
 
             // Setting the buttons
-            if(isset(this.params.buttons[index])){
+            if(isset(this.params.buttons) && isset(this.params.buttons[index])){
                 this.setupButtons(this.params.buttons[index], elements);
             }
         }
