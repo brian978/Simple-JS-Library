@@ -45,7 +45,6 @@ function Action(){
         // Logging
         if(logMessages()){
             console.log('Function has been registered');
-        //            console.log('Parameters: ' + this.objInstance + '(objInstance), ' + this.methodName + '(methodName), ' + this.params + '(params)');
         }
 
         return this;
