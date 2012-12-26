@@ -45,7 +45,7 @@ function Action(){
         // Logging
         if(logMessages()){
             console.log('Function has been registered');
-//            console.log('Parameters: ' + this.objInstance + '(objInstance), ' + this.methodName + '(methodName), ' + this.params + '(params)');
+        //            console.log('Parameters: ' + this.objInstance + '(objInstance), ' + this.methodName + '(methodName), ' + this.params + '(params)');
         }
 
         return this;
@@ -107,29 +107,43 @@ function Action(){
                 // Checking if the last action was executed already or not
                 if(_this.executed === false){
 
-                    // Default string value
-                    var evalStr = _this.methodName + '.apply(';
+                    if(typeof _this.methodName == 'string')
+                    {
+                        // Default string value
+                        var evalStr = _this.methodName + '.apply(';
 
-                    // Setting the object instance
-                    if(isset(_this.objInstance)){
-                        evalStr = '_this.objInstance.' + evalStr + '_this.objInstance, ';
-                    } else {
-                        evalStr += 'null, ';
+                        // Setting the object instance
+                        if(isset(_this.objInstance))
+                        {
+                            evalStr = '_this.objInstance.' + evalStr + '_this.objInstance, ';
+                        }
+                        else
+                        {
+                            evalStr += 'null, ';
+                        }
+
+                        // Adding the rest of the elements for the string
+                        evalStr += '_this.params);';
+
+                        // Logging
+                        if(logMessages()){
+                            console.log(evalStr);
+                        }
+
+                        // Evaluating the string
+                        eval(evalStr);
+
+                        // Setting the flag
+                        _this.executed = true;
                     }
+                    // Anonymous functions can only be called if a object instance is not given
+                    else if(!isset(_this.objInstance))
+                    {
+                        _this.methodName(_this.params);
 
-                    // Adding the rest of the elements for the string
-                    evalStr += '_this.params);';
-
-                    // Logging
-                    if(logMessages()){
-                        console.log(evalStr);
+                        // Setting the flag
+                        _this.executed = true;
                     }
-
-                    // Evaluating the string
-                    eval(evalStr);
-
-                    // Setting the flag
-                    _this.executed = true;
 
                 } else {
 
