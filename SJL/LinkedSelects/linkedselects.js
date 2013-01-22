@@ -257,6 +257,7 @@ function LinkedSelects(params)
         // Sorting the options of the destination elements
         if(moved === true && sort === true){
             this.sortOptions(linkedElement);
+            this.callAfterMoveCallback();
         }
     }
 
@@ -337,5 +338,24 @@ function LinkedSelects(params)
         }
 
         return attributes;
+    }
+
+    /**
+     * The method calls the given callback (if there is one of course)
+     *
+     * @param void
+     * @return void
+     */
+    this.callAfterMoveCallback = function(){
+
+        if(typeof this.params.afterMoveCallback === 'function')
+        {
+            this.params.afterMoveCallback();
+        }
+        // Support for callbacks build with the Action object
+        else if(this.params.afterMoveCallback instanceof Action)
+        {
+            this.params.afterMoveCallback.execute();
+        }
     }
 }
