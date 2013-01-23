@@ -21,29 +21,45 @@ function LinkedSelects(params)
     // Closure
     var _this = this;
 
-    this.params  = params || new Object();
+    this.params  = {};
+
+    // Defining the available params
+    this.params.selects = null;
+    this.params.buttons = null;
+    this.params.callbacks = {};
+
+    // Defining the available callbacks
+    this.params.callbacks.afterMove = null;
 
     // Links between the selects Array( selectId => linkedSelectObj )
-    this.links   = new Array();
+    this.links   = [];
 
     // Holds the links between the buttons and the selects Array( buttonId => linkedSelectObj )
-    this.buttons = new Array();
+    this.buttons = [];
+
+    // Holds the callbacks for each of the selects
+    this.callbacks = [];
+
+    // Replacing the class params with the given ones
+    if(typeof params === 'object')
+    {
+        this.params = params;
+    }
 
     /**
      * Initializes the object
      *
-     * @param {Void}
      * @return void
      */
     this.init = function(){
         $(document).ready(function(){
             if(isset(_this.params.selects[0])){
                 for(var i in _this.params.selects){
-                    _this.linkSelects(_this.params.selects[i], i);
+                    _this.setupSelects(_this.params.selects[i], i);
                 }
             }
         });
-    }
+    };
 
     /**
      * Links 2 select boxes
@@ -52,7 +68,7 @@ function LinkedSelects(params)
      * @param {Integer} index
      * @return void
      */
-    this.linkSelects = function(elements, index){
+    this.setupSelects = function(elements, index){
 
         // Getting the element objects
         var parentElement = $('#' + elements.parent);
@@ -61,7 +77,7 @@ function LinkedSelects(params)
         // If the elements are not present we do nothing
         if(isset(parentElement) && isset(childElement))
         {
-            // Linking the elements
+            // Linking the elements using their IDs
             this.links[elements.parent] = childElement;
             this.links[elements.child]  = parentElement;
 
@@ -74,12 +90,18 @@ function LinkedSelects(params)
                 console.log('Initialized the select boxes');
             }
 
-            // Setting the events
-            this.setupEvents(elements);
+            // Setting the events for the lists
+            this.setupSelectEvents(elements);
 
             // Setting the buttons
             if(isset(this.params.buttons) && isset(this.params.buttons[index])){
                 this.setupButtons(this.params.buttons[index], elements);
+            }
+
+            // Setting up the callbacks for the lists
+            if(isset(this.params.callbacks.afterMove) && isset(this.params.callbacks.afterMove[index]))
+            {
+                this.setupCallbacks(this.params.callbacks.afterMove[index], elements);
             }
         }
         else
@@ -89,7 +111,7 @@ function LinkedSelects(params)
                 console.log('Failed to initialize the select boxes (make sure they exist)');
             }
         }
-    }
+    };
 
     /**
      * Adds the buttons for the select boxes
@@ -107,7 +129,7 @@ function LinkedSelects(params)
         // If the elements are not present we do nothing
         if(isset(parentButton) && isset(parentButton))
         {
-            // Linking the buttons to the elements they target
+            // Linking the buttons to the elements (which are objects) they target, again using the button IDs
             this.buttons[buttons.parent] = elements.parent;
             this.buttons[buttons.child]  = elements.child;
 
@@ -124,7 +146,7 @@ function LinkedSelects(params)
                 console.log('Initialized the buttons');
             }
 
-            // Setting the events
+            // Setting the events for the buttons
             this.setupButtonEvents(buttons);
         }
         else
@@ -134,7 +156,52 @@ function LinkedSelects(params)
                 console.log('Failed to initialize the buttons (make sure they exist)');
             }
         }
-    }
+    };
+
+    /**
+     * Adds the callbacks for the select boxes
+     *
+     * @param {Object} callbacks
+     * @param {Object} elements
+     * @return void
+     */
+    this.setupCallbacks = function (callbacks, elements)
+    {
+        if((isset(callbacks.any) && !isset(callbacks.parent) && !isset(callbacks.child))
+            || (isset(callbacks.parent) && isset(callbacks.child)))
+        {
+            var parentId = elements.parent.attr('id');
+            var childId = elements.child.attr('id');
+
+            // Linking the buttons to the elements they target, again using the button IDs
+            if(isset(callbacks.any))
+            {
+                this.callbacks[parentId] = callbacks.any;
+                this.callbacks[childId] = callbacks.any;
+            }
+            else
+            {
+                this.callbacks[parentId] = callbacks.parent;
+                this.callbacks[childId] = callbacks.child;
+            }
+
+            // Logging
+            if (logMessages())
+            {
+                console.log('Initialized the callbacks');
+            }
+        }
+        else
+        {
+            alert('Callbacks could not be set because they either don\'t exist or are not configured properly');
+
+            // Logging
+            if (logMessages())
+            {
+                console.log('Callbacks could not be set because they either don\'t exist or are not configured properly');
+            }
+        }
+    };
 
     /**
      * Sets up the event handlers
@@ -142,16 +209,18 @@ function LinkedSelects(params)
      * @param {Object} elements
      * @return void
      */
-    this.setupEvents = function(elements){
+    this.setupSelectEvents = function(elements){
 
         // Event for the parent select
         elements.parent.bind('dblclick', function(){
             _this.processClick(elements.parent);
+            _this.callCallbacks(elements.parent);
         });
 
         // Event for the child select
         elements.child.bind('dblclick', function(){
             _this.processClick(elements.child);
+            _this.callCallbacks(elements.child);
         });
 
         // For visual feedback we need to remove the selected options of a select box
@@ -170,7 +239,7 @@ function LinkedSelects(params)
         if(logMessages()){
             console.log('Double click events have been set up for "' + elements.parent.attr('id') + '" and "' + elements.child.attr('id') + '"');
         }
-    }
+    };
 
     /**
      * Sets up the event handlers for the buttons
@@ -211,7 +280,7 @@ function LinkedSelects(params)
         if(logMessages()){
             console.log('Button events have been set up for "' + parentId + '" and "' + childId + '"');
         }
-    }
+    };
 
     /**
      * Processes the click action
@@ -257,9 +326,8 @@ function LinkedSelects(params)
         // Sorting the options of the destination elements
         if(moved === true && sort === true){
             this.sortOptions(linkedElement);
-            this.callAfterMoveCallback();
         }
-    }
+    };
 
     /**
      * Sorts the options of an element
@@ -269,11 +337,11 @@ function LinkedSelects(params)
      */
     this.sortOptions = function(selectBox){
 
-        var attributes  = new Array();
-        var sortable    = new Array();
+        var attributes  = [];
+        var sortable    = [];
         var text        = null;
         var options     = selectBox.find('option');
-        var option      = null
+        var option      = null;
 
         options.each(function(index){
             option           = $(this);
@@ -297,7 +365,7 @@ function LinkedSelects(params)
             console.log('Sorting the elements in the select box with ID "' + selectBox.attr('id') + '"');
             console.log('##############################################################################');
         }
-    }
+    };
 
     /**
      * Creates an option element using the given data
@@ -317,18 +385,18 @@ function LinkedSelects(params)
         }
 
         return option;
-    }
+    };
 
     /**
      * The method retrieves all the attributes of an element
      *
      * @param {Object} element
-     * @return array
+     * @return Array
      */
     this.getAttributes = function(element){
 
         var nodeMap     = element[0].attributes;
-        var attributes  = new Array();
+        var attributes  = [];
 
         for(var i=0; i < nodeMap.length; i++){
 
@@ -338,24 +406,26 @@ function LinkedSelects(params)
         }
 
         return attributes;
-    }
+    };
 
     /**
      * The method calls the given callback (if there is one of course)
      *
-     * @param void
+     * @param {Object} element
      * @return void
      */
-    this.callAfterMoveCallback = function(){
+    this.callCallbacks = function(element){
 
-        if(typeof this.params.afterMoveCallback === 'function')
+        var elementId = element.attr('id');
+
+        if(typeof this.callbacks[elementId] === 'function')
         {
-            this.params.afterMoveCallback();
+            this.callbacks[elementId]();
         }
         // Support for callbacks build with the Action object
-        else if(this.params.afterMoveCallback instanceof Action)
+        else if(this.callbacks[elementId] instanceof Action)
         {
-            this.params.afterMoveCallback.execute();
+            this.callbacks[elementId].execute();
         }
-    }
+    };
 }
