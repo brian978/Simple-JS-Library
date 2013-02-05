@@ -255,17 +255,20 @@ function LinkedSelects(params)
         // Event for the parent btn
         buttons.parent.bind('click', function(){
             _this.processClick(_this.buttons[parentId]);
+            _this.callCallbacks(_this.buttons[parentId]);
         });
 
         // Event for the child btn
         buttons.child.bind('click', function(){
             _this.processClick(_this.buttons[childId]);
+            _this.callCallbacks(_this.buttons[childId]);
         });
 
         // Event for the parent all
         if(isset(buttons.parentAll) && buttons.parentAll instanceof jQuery){
             buttons.parentAll.bind('click', function(){
                 _this.processClick(_this.buttons[parentId], 'option', false);
+                _this.callCallbacks(_this.buttons[parentId]);
             });
         }
 
@@ -273,6 +276,7 @@ function LinkedSelects(params)
         if(isset(buttons.childAll) && buttons.childAll instanceof jQuery){
             buttons.childAll.bind('click', function(){
                 _this.processClick(_this.buttons[childId], 'option', false);
+                _this.callCallbacks(_this.buttons[childId]);
             });
         }
 
