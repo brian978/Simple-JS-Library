@@ -16,7 +16,7 @@
  * Used to trigger an action when the state of an element changes
  *
  * @param {Object} params
- * @return void
+ * @return object
  */
 function ActionTrigger(params)
 {
@@ -25,6 +25,19 @@ function ActionTrigger(params)
 
     // Params
     this.params = params || {};
+
+    this.callbacks = {
+        DOMNodeInserted: null
+    };
+
+    // Object of the element
+    this.object = null;
+
+    // Timeout ID
+    this.timeout = null;
+
+    // Flag that is used by the timer method
+    this.stateChanged = false;
 
     /**
      * --------------------
@@ -56,77 +69,23 @@ function ActionTrigger(params)
     }
 
     /**
-     * The method gets the info about the observed object
-     *
-     * @return void
-     */
-    this.init = function ()
-    {
-        // Checking if we have an action object
-        if (this.params.action instanceof Action)
-        {
-            // Object of the element
-            this.object = null;
-
-            // Timeout ID
-            this.timeout = null;
-
-            this.stateChanged = false;
-
-            // Initializing the loading screen variable
-            this.loadScr = (this.params.loadingScreen == true ? new LoadingScreen() : null);
-
-            // Getting the observed object
-            this.getObservedObject();
-
-            // Checking if we have an object
-            if (this.object !== null)
-            {
-                this.bindEvents();
-
-                // Starting the counter
-                this.beginProcess();
-
-            }
-            else
-            {
-                // Logging
-                if (logMessages())
-                {
-                    console.log('Could not find an object with the given ID.');
-                }
-            }
-
-        }
-        else
-        {
-            // Logging
-            if (logMessages())
-            {
-                console.log('The ActionTrigger object needs an Action object.');
-            }
-        }
-    }
-
-    /**
      * Gets the observed object
      *
      * @return void
      */
     this.getObservedObject = function ()
     {
-        // Checking if we have and element ID
         if (this.params.elementId !== null)
         {
             this.object = $('#' + this.params.elementId);
 
-            // Checking if an object was found
+            // The length must be greater then 0 if an object is found
             if (this.object.length <= 0)
             {
                 this.object = null;
             }
         }
-    }
+    };
 
     /**
      *
@@ -134,21 +93,27 @@ function ActionTrigger(params)
      */
     this.bindEvents = function ()
     {
-        var obj = $(this.object);
-        var callback = function ()
+        this.callbacks.DOMNodeInserted = function ()
         {
-            // Logging
             if (logMessages())
             {
-                console.log('Object has changed it\'s state.');
+                console.log('Object has changed it\'s contents.');
             }
 
             _this.stateChanged = true;
         };
 
-        obj.bind('DOMNodeInserted', callback);
-        obj.bind('DOMNodeRemoved', callback);
-    }
+        this.object.bind('DOMNodeInserted', this.callbacks.DOMNodeInserted);
+    };
+
+    /**
+     *
+     * @return void
+     */
+    this.unbindEvents = function ()
+    {
+        this.object.unbind('DOMNodeInserted', this.callbacks.DOMNodeInserted);
+    };
 
     /**
      * The method acts like a timer and checks if the observed object has changed it's value
@@ -158,15 +123,11 @@ function ActionTrigger(params)
      */
     this.timer = function (counter)
     {
-        // Counter variable
-        var counter = counter;
-
         // Checking if the counter has reached the limit
         if (counter < this.params.waitPeriod && this.stateChanged == false)
         {
             counter++;
 
-            // Logging
             if (logMessages())
             {
                 console.log('Counter at ' + counter);
@@ -180,7 +141,6 @@ function ActionTrigger(params)
         }
         else if (this.stateChanged == true)
         {
-            // Logging
             if (logMessages())
             {
                 console.log('The observed object has changed it\'s state. Canceling and triggering action.');
@@ -189,13 +149,11 @@ function ActionTrigger(params)
             // Canceling the loop
             this.cancel();
 
-            // Triggering the action
             this.params.action.execute();
 
         }
         else
         {
-            // Logging
             if (logMessages())
             {
                 console.log('Operation timed out. The observed object has not changed it\'s state. Canceling...');
@@ -204,7 +162,7 @@ function ActionTrigger(params)
             // Canceling the loop
             this.cancel();
         }
-    }
+    };
 
     /**
      * The method prepares the requirements to start the timer
@@ -218,22 +176,20 @@ function ActionTrigger(params)
         {
             this.loadScr.show();
 
-            // Logging
             if (logMessages())
             {
                 console.log('Loading screen activated.');
             }
         }
 
-        // Starting the timer
+        this.bindEvents();
         this.timer(0);
 
-        // Logging
         if (logMessages())
         {
             console.log('Timer started.');
         }
-    }
+    };
 
     /**
      * The method cancels the counter
@@ -247,12 +203,13 @@ function ActionTrigger(params)
         {
             this.loadScr.destroy();
 
-            // Logging
             if (logMessages())
             {
                 console.log('Loading screen destroyed.');
             }
         }
+
+        this.unbindEvents();
 
         // Clearing the timeout ID
         if (this.timeout != null)
@@ -260,10 +217,47 @@ function ActionTrigger(params)
             clearTimeout(this.timeout);
         }
 
-        // Logging
         if (logMessages())
         {
             console.log('Timer canceled.');
+        }
+    };
+
+    return {
+        init: function ()
+        {
+            // Checking if we have an action object
+            if (_this.params.action instanceof Action)
+            {
+                // Initializing the loading screen variable
+                _this.loadScr = (_this.params.loadingScreen == true ? new LoadingScreen() : null);
+
+                // Getting the observed object
+                _this.getObservedObject();
+
+                // Checking if we have an object
+                if (_this.object !== null)
+                {
+                    // Starting the counter
+                    _this.beginProcess();
+
+                }
+                else
+                {
+                    if (logMessages())
+                    {
+                        console.log('Could not find an object with the given ID.');
+                    }
+                }
+
+            }
+            else
+            {
+                if (logMessages())
+                {
+                    console.log('The ActionTrigger object needs an Action object.');
+                }
+            }
         }
     }
 }
