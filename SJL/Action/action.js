@@ -15,7 +15,6 @@
 /**
  * Class constructor
  *
- * @param {Void}
  * @return void
  */
 function Action(){
@@ -69,8 +68,7 @@ function Action(){
     /**
      * Gets the params
      *
-     * @param {Void}
-     * @return void
+     * @return array
      */
     this.get = function(){
         return this.params;
@@ -79,7 +77,6 @@ function Action(){
     /**
      * Resets the executed flag
      *
-     * @param {Void}
      * @return void
      */
     this.reset = function(){
@@ -89,7 +86,6 @@ function Action(){
     /**
      * Executes the registered action
      *
-     * @param {Void}
      * @return boolean
      */
     this.execute = function(){

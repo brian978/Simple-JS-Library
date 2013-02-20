@@ -4,11 +4,11 @@
  *
  * @author Brian
  * @link https://github.com/brian978
- * @copyright 2012
+ * @copyright 2013
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name ActionTriger
- * @version 1.0
+ * @version 1.3
  *
  */
 
@@ -24,7 +24,7 @@ function ActionTrigger(params)
     var _this = this;
 
     // Params
-    this.params = params || new Object();
+    this.params = params || {};
 
     /**
      * --------------------
@@ -32,291 +32,238 @@ function ActionTrigger(params)
      * --------------------
      */
     // Checking if we have an element ID
-    if(!isset(this.params.elementId)){
+    if (!isset(this.params.elementId))
+    {
         this.params.elementId = null;
     }
 
     // By default the class triggers a loading screen
-    if(!isset(this.params.loadingScreen)){
+    if (!isset(this.params.loadingScreen))
+    {
         this.params.loadingScreen = true;
     }
 
     // By default the wait period before the class will stop watching the element (in seconds)
-    if(!isset(this.params.waitPeriod)){
+    if (!isset(this.params.waitPeriod))
+    {
         this.params.waitPeriod = 10;
     }
 
     // By default we have no Action object
-    if(!isset(this.params.action)){
+    if (!isset(this.params.action))
+    {
         this.params.action = null;
     }
 
-   /**
-    * The method gets the info about the observed object
-    *
-    * @param {Void}
-    * @return void
-    */
-   this.init = function(){
-
+    /**
+     * The method gets the info about the observed object
+     *
+     * @return void
+     */
+    this.init = function ()
+    {
         // Checking if we have an action object
-        if(this.params.action instanceof Action){
+        if (this.params.action instanceof Action)
+        {
+            // Object of the element
+            this.object = null;
 
-             // Object of the element
-             this.object = null;
+            // Timeout ID
+            this.timeout = null;
 
-             // Observed object type
-             this.objectType = null;
+            this.stateChanged = false;
 
-             // Observed object value
-             this.objectValue = null;
+            // Initializing the loading screen variable
+            this.loadScr = (this.params.loadingScreen == true ? new LoadingScreen() : null);
 
-             // Timeout ID
-             this.timeoutId = null;
+            // Getting the observed object
+            this.getObservedObject();
 
-             // Initializing the loading screen variable
-             this.loadScr = (this.params.loadingScreen == true ? new LoadingScreen() : null);
-
-             // Getting the observed object
-             this.getObject();
-
-             // Checking if we have an object
-             if(this.object !== null){
-
-                // Getting the observed object type
-                this.getObjectType();
-
-                // Getting the initial value of the object value
-                this.getObjectValue();
+            // Checking if we have an object
+            if (this.object !== null)
+            {
+                this.bindEvents();
 
                 // Starting the counter
                 this.beginProcess();
 
-             } else {
-
+            }
+            else
+            {
                 // Logging
-                if(logMessages()){
+                if (logMessages())
+                {
                     console.log('Could not find an object with the given ID.');
                 }
-             }
+            }
 
-        } else {
-
-             // Logging
-             if(logMessages()){
-                 console.log('The ActionTrigger object need an Action object.');
-             }
         }
-   }
+        else
+        {
+            // Logging
+            if (logMessages())
+            {
+                console.log('The ActionTrigger object needs an Action object.');
+            }
+        }
+    }
 
     /**
      * Gets the observed object
      *
-     * @param {Void}
      * @return void
      */
-    this.getObject = function(){
-
+    this.getObservedObject = function ()
+    {
         // Checking if we have and element ID
-        if(this.params.elementId !== null){
+        if (this.params.elementId !== null)
+        {
             this.object = $('#' + this.params.elementId);
 
             // Checking if an object was found
-            if(this.object.length <= 0){
+            if (this.object.length <= 0)
+            {
                 this.object = null;
             }
         }
     }
 
-   /**
-    * Gets the type of the observed object
-    *
-    * @param {Void}
-    * @return void
-    */
-   this.getObjectType = function(){
+    /**
+     *
+     * @return void
+     */
+    this.bindEvents = function ()
+    {
+        var obj = $(this.object);
+        var callback = function ()
+        {
+            // Logging
+            if (logMessages())
+            {
+                console.log('Object has changed it\'s state.');
+            }
 
-        // Checking if we have an object
-        if(this.object !== null){
-            this.objectType = new String(this.object.get(0).tagName).toLowerCase();
-        }
-   }
+            _this.stateChanged = true;
+        };
 
-   /**
-    * Gets the value of an object depending on the object type
-    *
-    * @param {boolean} returnVal
-    * @return mixed
-    */
-   this.getObjectValue = function(returnVal){
+        obj.bind('DOMNodeInserted', callback);
+        obj.bind('DOMNodeRemoved', callback);
+    }
 
-        // Object value
-        var value = null;
+    /**
+     * The method acts like a timer and checks if the observed object has changed it's value
+     *
+     * @param {Number} counter
+     * @return void
+     */
+    this.timer = function (counter)
+    {
+        // Counter variable
+        var counter = counter;
 
-        // Getting the value depending on the object type
-        if(this.objectType == 'div' || this.objectType == 'span' || this.objectType == 'button' || this.objectType == 'textarea'){
-
-            value = this.object.html();
-
-        } else if (this.objectType == 'select'){
-
-            value = this.object.find('option:selected').val();
-
-        } else if (this.objectType == 'iframe'){
-
-            /**
-             * @TODO get contents of the iframe after it has loaded
-             */
-            value = this.object.contents().find("body").html();
-
-        }
-
-        // Checking if the value should be returned
-        if(returnVal == true){
-
-           return value;
-
-        } else {
-
-           this.objectValue = value;
-
-        }
-
-        return null;
-   }
-
-   /**
-    * Used to check the state of the object
-    *
-    * @param {Void}
-    * @return boolean
-    */
-   this.checkState = function(){
-
-        // Flag
-        var changed = false;
-
-        // Checking the state
-        if(this.getObjectValue(true) != this.objectValue){
-            changed = true;
+        // Checking if the counter has reached the limit
+        if (counter < this.params.waitPeriod && this.stateChanged == false)
+        {
+            counter++;
 
             // Logging
-            if(logMessages()){
-                console.log('Object has changed it\'s state.');
+            if (logMessages())
+            {
+                console.log('Counter at ' + counter);
+            }
+
+            this.timeout = setTimeout(function ()
+            {
+                _this.timer(counter)
+            }, 1000);
+
+        }
+        else if (this.stateChanged == true)
+        {
+            // Logging
+            if (logMessages())
+            {
+                console.log('The observed object has changed it\'s state. Canceling and triggering action.');
+            }
+
+            // Canceling the loop
+            this.cancel();
+
+            // Triggering the action
+            this.params.action.execute();
+
+        }
+        else
+        {
+            // Logging
+            if (logMessages())
+            {
+                console.log('Operation timed out. The observed object has not changed it\'s state. Canceling...');
+            }
+
+            // Canceling the loop
+            this.cancel();
+        }
+    }
+
+    /**
+     * The method prepares the requirements to start the timer
+     *
+     * @return void
+     */
+    this.beginProcess = function ()
+    {
+        // Checking if we have a loading screen
+        if (this.loadScr !== null)
+        {
+            this.loadScr.show();
+
+            // Logging
+            if (logMessages())
+            {
+                console.log('Loading screen activated.');
             }
         }
 
-        // Returning
-        return changed;
-   }
-
-   /**
-    * The method acts like a timer and checks if the observed object has changed it's value
-    *
-    * @param {Number} counter
-    * @return void
-    */
-   this.timer = function(counter){
-
-        // Counter variable
-        var counter = counter || 0;
-
-        // Determins if the state has changed
-        var stateChanged = this.checkState();
-
-        // Checking if the counter has reached the limit
-        if(counter < this.params.waitPeriod && stateChanged == false){
-
-            counter++;
-
-             // Logging
-             if(logMessages()){
-                 console.log('Counter at ' + counter);
-             }
-
-            this.timeout = setTimeout(function(){ _this.timer(counter) }, 1000);
-
-        } else if(stateChanged == true){
-
-             // Logging
-             if(logMessages()){
-                 console.log('The observed object has changed it\'s state. Canceling and triggering action.');
-             }
-
-            // Canceling the loop
-            this.cancel();
-
-             // Triggering the action
-             if(this.params.action !== null){
-                 this.params.action.execute();
-             }
-
-        } else {
-
-             // Logging
-             if(logMessages()){
-                 console.log('Operation timed out. The observed object has not changed it\'s state. Canceling...');
-             }
-
-            // Canceling the loop
-            this.cancel();
-        }
-   }
-
-   /**
-    * The method prepares the requirements to start the timer
-    *
-    * @param {Void}
-    * @return void
-    */
-   this.beginProcess = function(){
-
-        // Checking if we have a loading screen
-        if(this.loadScr !== null){
-            this.loadScr.show();
-
-             // Logging
-             if(logMessages()){
-                 console.log('Loading screen activated.');
-             }
-        }
-
         // Starting the timer
-        this.timer();
+        this.timer(0);
 
         // Logging
-        if(logMessages()){
+        if (logMessages())
+        {
             console.log('Timer started.');
         }
-   }
+    }
 
-   /**
-    * The method cancels the counter
-    *
-    * @param {Void}
-    * @return void
-    */
-   this.cancel = function(){
-
+    /**
+     * The method cancels the counter
+     *
+     * @return void
+     */
+    this.cancel = function ()
+    {
         // Checking if we have a loading screen
-        if(this.loadScr !== null){
+        if (this.loadScr !== null)
+        {
             this.loadScr.destroy();
 
             // Logging
-            if(logMessages()){
+            if (logMessages())
+            {
                 console.log('Loading screen destroyed.');
             }
         }
 
         // Clearing the timeout ID
-        if(this.timeout != null){
-
+        if (this.timeout != null)
+        {
             clearTimeout(this.timeout);
         }
 
         // Logging
-        if(logMessages()){
+        if (logMessages())
+        {
             console.log('Timer canceled.');
         }
-   }
+    }
 }
