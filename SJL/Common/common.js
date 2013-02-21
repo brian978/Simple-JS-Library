@@ -107,19 +107,45 @@ function logMessages()
 }
 
 /**
+ * Returns the type of a jQuery DOM element
  *
- * @param object
+ * @param element
  * @returns {string}
  */
-function getObjectType(object)
+function getElementType(element)
 {
     var result = '';
 
-    if(object instanceof jQuery)
+    if(element instanceof jQuery)
     {
-        result = new String(object.get(0).tagName).toLowerCase();
+        result = new String(element.get(0).tagName).toLowerCase();
     }
 
     return result;
 }
 
+/**
+ * Returns the attributes of a jQuery DOM element
+ *
+ * @param {Object} element
+ * @returns {Array}
+ */
+function getElementAttributes(element)
+{
+    var attributes = [];
+
+    if(element instanceof jQuery)
+    {
+        var nodeMap = element[0].attributes;
+
+        for (var i = 0; i < nodeMap.length; i++)
+        {
+
+            // The item is an object from the map
+            var item = nodeMap.item(i);
+            attributes[item.nodeName] = item.nodeValue;
+        }
+    }
+
+    return attributes;
+}

@@ -99,7 +99,7 @@ function ActionTrigger(params)
     {
         if(this.objectType == null)
         {
-            this.objectType = getObjectType(this.object);
+            this.objectType = getElementType(this.object);
         }
 
         return this.objectType;

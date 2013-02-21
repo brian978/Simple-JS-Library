@@ -427,18 +427,7 @@ function LinkedSelects(params)
      */
     this.getAttributes = function (element)
     {
-        var nodeMap = element[0].attributes;
-        var attributes = [];
-
-        for (var i = 0; i < nodeMap.length; i++)
-        {
-
-            // The item is an object from the map
-            var item = nodeMap.item(i);
-            attributes[item.nodeName] = item.nodeValue;
-        }
-
-        return attributes;
+        return getElementAttributes(element);
     };
 
     /**

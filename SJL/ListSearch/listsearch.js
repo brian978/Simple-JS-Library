@@ -55,6 +55,7 @@ function ListSearch(params)
     $this.init = function ()
     {
         var allOk = true;
+        var id;
 
         if (logMessages())
         {
@@ -62,7 +63,7 @@ function ListSearch(params)
         }
 
         // Creating the required objects
-        for (var id in $this.requiredIds)
+        for (id in $this.requiredIds)
         {
             var objectIdentifier = $this.requiredIds[id];
 
@@ -77,7 +78,7 @@ function ListSearch(params)
         }
 
         // Creating the optional objects
-        for (var id in $this.optionalIds)
+        for (id in $this.optionalIds)
         {
             var object = $('#' + $this.params[id]);
 
@@ -112,7 +113,7 @@ function ListSearch(params)
         }
 
        return $this;
-    }
+    };
 
     /**
      *
@@ -129,7 +130,7 @@ function ListSearch(params)
         $this.buildCache();
 
         return $this;
-    }
+    };
 
     /**
      *
@@ -222,7 +223,7 @@ function ListSearch(params)
             $(this).attr('index', index);
 
             $this.cache[index] = {
-                attributes: $this.getAttributes($(this)),
+                attributes: getElementAttributes($(this)),
                 value: $(this).html()
             };
 
@@ -262,12 +263,13 @@ function ListSearch(params)
             console.log('Searching for: ' + value);
         }
 
+        var index;
         var results = {};
         var localCache = jQuery.extend({}, $this.cache);
         var regex = new RegExp('^' + value, 'i');
 
         // Searching the words that start with the desired characters
-        for (var index in localCache)
+        for (index in localCache)
         {
             if (localCache[index].value.search(regex) != -1)
             {
@@ -288,7 +290,7 @@ function ListSearch(params)
         regex = new RegExp(value, 'i');
 
         // Searching everywhere
-        for (var index in localCache)
+        for (index in localCache)
         {
             if (localCache[index].value.search(regex) != -1)
             {
@@ -347,26 +349,6 @@ function ListSearch(params)
         }
 
         return $this;
-    };
-
-    /**
-     *
-     * @param {Object} option
-     * @returns {Array}
-     */
-    $this.getAttributes = function (option)
-    {
-        var nodeMap = option[0].attributes;
-        var attributes = [];
-
-        for (var i = 0; i < nodeMap.length; i++)
-        {
-            // The item is an object from the map
-            var item = nodeMap.item(i);
-            attributes[item.nodeName] = item.nodeValue;
-        }
-
-        return attributes;
     };
 
     // Setting the options provided by the user
