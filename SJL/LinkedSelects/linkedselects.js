@@ -74,7 +74,6 @@ function LinkedSelects(params)
      */
     this.setupSelects = function (elements, index)
     {
-
         // Getting the element objects
         var parentElement = $('#' + elements.parent);
         var childElement = $('#' + elements.child);
@@ -130,7 +129,6 @@ function LinkedSelects(params)
      */
     this.setupButtons = function (buttons, elements)
     {
-
         // Getting the button objects
         var parentButton = $('#' + buttons.parent);
         var childButton = $('#' + buttons.child);
@@ -178,8 +176,7 @@ function LinkedSelects(params)
      */
     this.setupCallbacks = function (callbacks, elements)
     {
-        if ((isset(callbacks.any) && !isset(callbacks.parent) && !isset(callbacks.child))
-            || (isset(callbacks.parent) && isset(callbacks.child)))
+        if (isset(callbacks.any) || isset(callbacks.parent) || isset(callbacks.child))
         {
             var parentId = elements.parent.attr('id');
             var childId = elements.child.attr('id');
@@ -192,8 +189,15 @@ function LinkedSelects(params)
             }
             else
             {
-                this.callbacks[parentId] = callbacks.parent;
-                this.callbacks[childId] = callbacks.child;
+                if(isset(callbacks.parent))
+                {
+                    this.callbacks[parentId] = callbacks.parent;
+                }
+
+                if(isset(callbacks.child))
+                {
+                    this.callbacks[childId] = callbacks.child;
+                }
             }
 
             // Logging
@@ -205,12 +209,6 @@ function LinkedSelects(params)
         else
         {
             alert('Callbacks could not be set because they either don\'t exist or are not configured properly');
-
-            // Logging
-            if (logMessages())
-            {
-                console.log('Callbacks could not be set because they either don\'t exist or are not configured properly');
-            }
         }
     };
 
@@ -222,7 +220,6 @@ function LinkedSelects(params)
      */
     this.setupSelectEvents = function (elements)
     {
-
         // Event for the parent select
         elements.parent.bind('dblclick', function ()
         {
@@ -266,7 +263,6 @@ function LinkedSelects(params)
      */
     this.setupButtonEvents = function (buttons)
     {
-
         var parentId = buttons.parent.attr('id');
         var childId = buttons.child.attr('id');
 
@@ -321,7 +317,6 @@ function LinkedSelects(params)
      */
     this.processClick = function (element, findWhat, doSort)
     {
-
         var linkedElement = this.links[element.attr('id')];
         var find = findWhat || 'option:selected';
         var sort = isset(doSort) ? doSort : true;
@@ -370,7 +365,6 @@ function LinkedSelects(params)
      */
     this.sortOptions = function (selectBox)
     {
-
         var attributes = [];
         var sortable = [];
         var text = null;
@@ -413,7 +407,6 @@ function LinkedSelects(params)
      */
     this.createOption = function (text, attributes)
     {
-
         // Creating the option
         var option = $('<option>' + text + '</option>');
 
@@ -434,7 +427,6 @@ function LinkedSelects(params)
      */
     this.getAttributes = function (element)
     {
-
         var nodeMap = element[0].attributes;
         var attributes = [];
 
@@ -457,17 +449,19 @@ function LinkedSelects(params)
      */
     this.callCallbacks = function (element)
     {
-
         var elementId = element.attr('id');
 
-        if (typeof this.callbacks[elementId] === 'function')
+        if(isset(this.callbacks[elementId]))
         {
-            this.callbacks[elementId]();
-        }
-        // Support for callbacks build with the Action object
-        else if (this.callbacks[elementId] instanceof Action)
-        {
-            this.callbacks[elementId].execute();
+            if (typeof this.callbacks[elementId] === 'function')
+            {
+                this.callbacks[elementId]();
+            }
+            // Support for callbacks build with the Action object
+            else if (this.callbacks[elementId] instanceof Action)
+            {
+                this.callbacks[elementId].execute();
+            }
         }
     };
 }
