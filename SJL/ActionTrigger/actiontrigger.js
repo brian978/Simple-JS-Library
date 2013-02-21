@@ -8,7 +8,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name ActionTriger
- * @version 1.3.1
+ * @version 1.3.2
  *
  */
 
