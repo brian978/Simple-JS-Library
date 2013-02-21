@@ -8,7 +8,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name ActionTriger
- * @version 1.3
+ * @version 1.3.1
  *
  */
 
@@ -27,11 +27,14 @@ function ActionTrigger(params)
     this.params = params || {};
 
     this.callbacks = {
-        DOMNodeInserted: null
+        DOMNodeInserted: null,
+        load: null
     };
 
     // Object of the element
     this.object = null;
+
+    this.objectType = null;
 
     // Timeout ID
     this.timeout = null;
@@ -88,12 +91,27 @@ function ActionTrigger(params)
     };
 
     /**
+     * Gets the type of the observed object
+     *
+     * @return string
+     */
+    this.getObjectType = function()
+    {
+        if(this.objectType == null)
+        {
+            this.objectType = new String(this.object.get(0).tagName).toLowerCase();
+        }
+
+        return this.objectType;
+    };
+
+    /**
      *
      * @return void
      */
     this.bindEvents = function ()
     {
-        this.callbacks.DOMNodeInserted = function ()
+        var callback = function ()
         {
             if (logMessages())
             {
@@ -103,7 +121,17 @@ function ActionTrigger(params)
             _this.stateChanged = true;
         };
 
-        this.object.bind('DOMNodeInserted', this.callbacks.DOMNodeInserted);
+        var event = 'DOMNodeInserted';
+
+        // For iframes the binding needs to be done on the load event
+        if(this.getObjectType() == 'iframe')
+        {
+            event = 'load';
+        }
+
+        this.callbacks[event] = callback;
+
+        this.object.bind(event, callback);
     };
 
     /**
@@ -112,7 +140,18 @@ function ActionTrigger(params)
      */
     this.unbindEvents = function ()
     {
-        this.object.unbind('DOMNodeInserted', this.callbacks.DOMNodeInserted);
+        for(var event in this.callbacks)
+        {
+            if(this.callbacks[event] !== null)
+            {
+                if (logMessages())
+                {
+                    console.log('Unbind event: ' + event);
+                }
+
+                this.object.unbind(event, this.callbacks[event]);
+            }
+        }
     };
 
     /**
@@ -123,6 +162,11 @@ function ActionTrigger(params)
      */
     this.timer = function (counter)
     {
+        if (logMessages() && counter == 0)
+        {
+            console.log('Timer started.');
+        }
+
         // Checking if the counter has reached the limit
         if (counter < this.params.waitPeriod && this.stateChanged == false)
         {
@@ -143,7 +187,7 @@ function ActionTrigger(params)
         {
             if (logMessages())
             {
-                console.log('The observed object has changed it\'s state. Canceling and triggering action.');
+                console.log('Canceling and triggering action.');
             }
 
             // Canceling the loop
@@ -184,11 +228,6 @@ function ActionTrigger(params)
 
         this.bindEvents();
         this.timer(0);
-
-        if (logMessages())
-        {
-            console.log('Timer started.');
-        }
     };
 
     /**
@@ -240,7 +279,6 @@ function ActionTrigger(params)
                 {
                     // Starting the counter
                     _this.beginProcess();
-
                 }
                 else
                 {
@@ -249,7 +287,6 @@ function ActionTrigger(params)
                         console.log('Could not find an object with the given ID.');
                     }
                 }
-
             }
             else
             {
