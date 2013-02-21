@@ -99,7 +99,7 @@ function ActionTrigger(params)
     {
         if(this.objectType == null)
         {
-            this.objectType = new String(this.object.get(0).tagName).toLowerCase();
+            this.objectType = getObjectType(this.object);
         }
 
         return this.objectType;

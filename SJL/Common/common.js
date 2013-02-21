@@ -2,18 +2,17 @@
  * Function checks if a variable exists
  *
  * @param {Mixed} variable
- * @return void
+ * @return boolean
  */
-function isset(variable){
-
-    if(typeof variable !== 'undefined' && variable !== null){
-
+function isset(variable)
+{
+    if (typeof variable !== 'undefined' && variable !== null)
+    {
         return true;
-
-    } else {
-
+    }
+    else
+    {
         return false;
-
     }
 }
 
@@ -23,7 +22,8 @@ function isset(variable){
  * @param {String} url
  * @return void
  */
-function redirect(url){
+function redirect(url)
+{
     location.replace(url);
 }
 
@@ -45,7 +45,10 @@ function is_numeric(n)
     var result = true;
 
     // ==== Checking the string length ==== //
-    if (n.length == 0) result = false;
+    if (n.length == 0)
+    {
+        result = false;
+    }
 
     // ==== Testing if the string contains valid characters ==== //
     for (var i = 0; i < n.length && result == true; i++)
@@ -67,12 +70,12 @@ function is_numeric(n)
 /**
  * Determins if the browser is Mozilla (uses jQuery)
  *
- * @param {Void}
  * @return boolean
  */
 function isMozilla()
 {
-    if(typeof isMozilla.result == 'undefined'){
+    if (typeof isMozilla.result == 'undefined')
+    {
         isMozilla.result = $.browser.mozilla;
     }
 
@@ -82,23 +85,41 @@ function isMozilla()
 /**
  * Determins if the scripts should log any messages
  *
- * @param {Void}
- * @return void
+ * @return boolean
  */
 function logMessages()
 {
-    if(typeof console == 'object'
+    // TODO: Comment section below on production env so it returns false
+    if (typeof console == 'object'
         && isMozilla()
         && (
-            (
-                isset(window.enableLogging)
+        (
+            isset(window.enableLogging)
                 && window.enableLogging === true
             )
             || !isset(window.enableLogging)
         )
-    ){
+    ) {
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 }
+
+/**
+ *
+ * @param object
+ * @returns {string}
+ */
+function getObjectType(object)
+{
+    var result = '';
+
+    if(object instanceof jQuery)
+    {
+        result = new String(object.get(0).tagName).toLowerCase();
+    }
+
+    return result;
+}
+

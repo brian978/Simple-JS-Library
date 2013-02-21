@@ -1,50 +1,134 @@
+/**
+ *
+ * @author Brian
+ * @link https://github.com/brian978
+ * @copyright 2012
+ * @license Creative Commons Attribution-ShareAlike 3.0
+ *
+ * @name ListSearch
+ * @version 1.3
+ *
+ */
+
+/**
+ *
+ * @param {Object} params
+ * @returns {{init: Function, refresh: Function}}
+ * @constructor
+ */
 function ListSearch(params)
 {
     var $this = this;
 
     $this.params = {
-        damperTimeout: 1000,
+        damperTimeout: 500,
         listId: null,
         searchId: null,
         clearId: null
     };
 
+    $this.cache = {};
+    $this.timeoutId = null;
+
+    // A list of required ID's: contains the id entry and objects entry
     $this.requiredIds = {
         listId: 'list',
         searchId: 'search'
     };
 
+    // Optional ID's with the same contents as requiredIds
     $this.optionalIds = {
         clearId: 'clear'
     };
 
+    // The objects for each ID
     $this.objects = {
         list: null,
         search: null,
         clear: null
     };
 
-    $this.cache = {};
-    $this.timeoutId = null;
-
-    for (var id in $this.requiredIds)
+    /**
+     *
+     * @returns ListSearch
+     */
+    $this.init = function ()
     {
-        if (isset(params[id]) && typeof params[id] == 'string')
+        var allOk = true;
+
+        if (logMessages())
         {
-            $this.params[id] = params[id];
+            console.log('ListSearch::init() method called');
         }
-        else
+
+        // Creating the required objects
+        for (var id in $this.requiredIds)
         {
-            alert('The listId parameter is missing or of the wrong type');
+            var objectIdentifier = $this.requiredIds[id];
+
+            $this.objects[objectIdentifier] = $('#' + $this.params[id]);
+
+            if ($this.objects[objectIdentifier].length == 0)
+            {
+                alert('The object for the ID ' + id + ' was not found');
+
+                allOk = false;
+            }
         }
+
+        // Creating the optional objects
+        for (var id in $this.optionalIds)
+        {
+            var object = $('#' + $this.params[id]);
+
+            if (object.length != 0)
+            {
+                $this.objects[$this.optionalIds[id]] = object;
+            }
+        }
+
+        if (allOk == true)
+        {
+            $this.buildCache();
+            $this.bindEvents();
+        }
+
+        return $this;
+    };
+
+    /**
+     *
+     * @param {Object} params
+     * @return ListSearch
+     */
+    $this.setOptions = function(params)
+    {
+        for(var option in $this.params)
+        {
+            if(isset(params[option]))
+            {
+                $this.params[option] = params[option];
+            }
+        }
+
+       return $this;
     }
 
-    for (var id in $this.optionalIds)
+    /**
+     *
+     * @returns ListSearch
+     */
+    $this.refresh = function ()
     {
-        if (isset(params[id]) && typeof params[id] == 'string')
+        if (logMessages())
         {
-            $this.params[id] = params[id];
+            console.log('ListSearch::refresh() method called');
         }
+
+        $this.cache = {};
+        $this.buildCache();
+
+        return $this;
     }
 
     /**
@@ -70,16 +154,18 @@ function ListSearch(params)
         });
 
         // Clear button
-        if($this.objects.clear !== null)
+        if ($this.objects.clear !== null)
         {
             $this.objects.clear.bind('click', function ()
             {
                 $this.clearSearch();
+
+                return false;
             });
         }
 
         return $this;
-    }
+    };
 
     /**
      *
@@ -91,7 +177,7 @@ function ListSearch(params)
         $this.showResults($this.cache);
 
         return $this;
-    }
+    };
 
     /**
      *
@@ -113,7 +199,7 @@ function ListSearch(params)
         $this.timeoutId = setTimeout(callback, $this.params.damperTimeout);
 
         return $this;
-    }
+    };
 
     /**
      * Reads the entire list and loads it into the cache
@@ -161,7 +247,7 @@ function ListSearch(params)
         $this.showResults($this.searchCache(value));
 
         return $this;
-    }
+    };
 
     /**
      *
@@ -261,7 +347,7 @@ function ListSearch(params)
         }
 
         return $this;
-    }
+    };
 
     /**
      *
@@ -283,50 +369,6 @@ function ListSearch(params)
         return attributes;
     };
 
-    return {
-        init: function ()
-        {
-            var objOk = true;
-
-            if (logMessages())
-            {
-                console.log('ListSearch::init() method called');
-            }
-
-            for (var id in $this.requiredIds)
-            {
-                var objectIdentifier = $this.requiredIds[id];
-
-                $this.objects[objectIdentifier] = $('#' + $this.params[id]);
-
-                if ($this.objects[objectIdentifier].length == 0)
-                {
-                    alert('The object for the ID ' + id + ' was not found');
-
-                    objOk = false;
-                }
-            }
-
-            for (var id in $this.optionalIds)
-            {
-                var object = $('#' + $this.params[id]);
-
-                if (object.length != 0)
-                {
-                    $this.objects[$this.optionalIds[id]] = object;
-                }
-            }
-
-            if (objOk == true)
-            {
-                $this.buildCache();
-                $this.bindEvents();
-            }
-        },
-        refresh: function ()
-        {
-            $this.cache = {};
-            $this.buildCache();
-        }
-    }
+    // Setting the options provided by the user
+    $this.setOptions(params);
 }
