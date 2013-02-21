@@ -5,23 +5,29 @@ function ListSearch(params)
     $this.params = {
         damperTimeout: 1000,
         listId: null,
-        searchId: null
+        searchId: null,
+        clearId: null
     };
 
-    $this.ids = {
+    $this.requiredIds = {
         listId: 'list',
         searchId: 'search'
     };
 
+    $this.optionalIds = {
+        clearId: 'clear'
+    };
+
     $this.objects = {
         list: null,
-        search: null
+        search: null,
+        clear: null
     };
 
     $this.cache = {};
     $this.timeoutId = null;
 
-    for (var id in $this.ids)
+    for (var id in $this.requiredIds)
     {
         if (isset(params[id]) && typeof params[id] == 'string')
         {
@@ -33,9 +39,17 @@ function ListSearch(params)
         }
     }
 
+    for (var id in $this.optionalIds)
+    {
+        if (isset(params[id]) && typeof params[id] == 'string')
+        {
+            $this.params[id] = params[id];
+        }
+    }
+
     /**
      *
-     * @returns {*}
+     * @returns ListSearch
      */
     $this.bindEvents = function ()
     {
@@ -44,6 +58,7 @@ function ListSearch(params)
             console.log('ListSearch::bindEvents() method called');
         }
 
+        // Search box
         $this.objects.search.bind('keyup', function ()
         {
             if ($this.timeoutId !== null)
@@ -54,13 +69,34 @@ function ListSearch(params)
             $this.initDamper($(this).val());
         });
 
+        // Clear button
+        if($this.objects.clear !== null)
+        {
+            $this.objects.clear.bind('click', function ()
+            {
+                $this.clearSearch();
+            });
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     * @returns ListSearch
+     */
+    $this.clearSearch = function ()
+    {
+        $this.objects.search.val('');
+        $this.showResults($this.cache);
+
         return $this;
     }
 
     /**
      *
      * @param {String} searchValue
-     * @returns {*}
+     * @returns ListSearch
      */
     $this.initDamper = function (searchValue)
     {
@@ -82,7 +118,7 @@ function ListSearch(params)
     /**
      * Reads the entire list and loads it into the cache
      *
-     * @returns {*}
+     * @returns ListSearch
      */
     $this.buildCache = function ()
     {
@@ -113,7 +149,7 @@ function ListSearch(params)
     /**
      *
      * @param {String} value
-     * @returns {*}
+     * @returns ListSearch
      */
     $this.doSearch = function (value)
     {
@@ -185,7 +221,7 @@ function ListSearch(params)
     /**
      *
      * @param {Object} results
-     * @returns {*}
+     * @returns ListSearch
      */
     $this.showResults = function (results)
     {
@@ -215,7 +251,7 @@ function ListSearch(params)
      *
      * @param {Object} option
      * @param {Array} attributes
-     * @returns {*}
+     * @returns ListSearch
      */
     $this.applyAttributes = function (option, attributes)
     {
@@ -257,9 +293,9 @@ function ListSearch(params)
                 console.log('ListSearch::init() method called');
             }
 
-            for (var id in $this.ids)
+            for (var id in $this.requiredIds)
             {
-                var objectIdentifier = $this.ids[id];
+                var objectIdentifier = $this.requiredIds[id];
 
                 $this.objects[objectIdentifier] = $('#' + $this.params[id]);
 
@@ -271,11 +307,26 @@ function ListSearch(params)
                 }
             }
 
+            for (var id in $this.optionalIds)
+            {
+                var object = $('#' + $this.params[id]);
+
+                if (object.length != 0)
+                {
+                    $this.objects[$this.optionalIds[id]] = object;
+                }
+            }
+
             if (objOk == true)
             {
                 $this.buildCache();
                 $this.bindEvents();
             }
+        },
+        refresh: function ()
+        {
+            $this.cache = {};
+            $this.buildCache();
         }
     }
 }
