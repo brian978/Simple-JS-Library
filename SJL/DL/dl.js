@@ -50,7 +50,8 @@ DL.execute = function(libraryPath){
         'InfiniteScroll': {},
         'ActionTrigger': {},
         'HashHandler': {},
-        'LinkedSelects': {}
+        'LinkedSelects': {},
+        'ListSearch': {}
     };
 
     // Loading the dependencies
