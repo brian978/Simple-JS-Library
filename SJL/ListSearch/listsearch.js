@@ -20,14 +20,21 @@ function ListSearch(params)
 {
     var $this = this;
 
+    // Defining the available params
     $this.params = {
         damperTimeout: 500,
         listId: null,
         searchId: null,
-        clearId: null
+        clearId: null,
+        autoSort: true
     };
 
+    // This will hold the contents of the target list
     $this.cache = {};
+    $this.cacheLength = 0;
+
+    // Timout ID is used to cancel the timeout when the user changes the
+    // contents of the search box
     $this.timeoutId = null;
 
     // A list of required ID's: contains the id entry and objects entry
@@ -41,7 +48,7 @@ function ListSearch(params)
         clearId: 'clear'
     };
 
-    // The objects for each ID
+    // The objects for each element
     $this.objects = {
         list: null,
         search: null,
@@ -102,17 +109,20 @@ function ListSearch(params)
      * @param {Object} params
      * @return ListSearch
      */
-    $this.setOptions = function(params)
+    $this.setOptions = function (params)
     {
-        for(var option in $this.params)
+        if (typeof params === 'object')
         {
-            if(isset(params[option]))
+            for (var option in $this.params)
             {
-                $this.params[option] = params[option];
+                if (isset(params[option]))
+                {
+                    $this.params[option] = params[option];
+                }
             }
         }
 
-       return $this;
+        return $this;
     };
 
     /**
@@ -127,6 +137,8 @@ function ListSearch(params)
         }
 
         $this.cache = {};
+        $this.cacheLength = 0;
+
         $this.buildCache();
 
         return $this;
@@ -177,6 +189,8 @@ function ListSearch(params)
         $this.objects.search.val('');
         $this.showResults($this.cache);
 
+        sortOptions($this.objects.list);
+
         return $this;
     };
 
@@ -214,24 +228,102 @@ function ListSearch(params)
             console.log('ListSearch::buildCache() method called');
         }
 
-        var index = 0;
+        if ($this.params.autoSort === true)
+        {
+            sortOptions($this.objects.list);
+        }
 
         $this.objects.list.find('option').each(function ()
         {
             // For element tracking purposes we add an index attribute so
             // we can identify the list entry when we search
-            $(this).attr('index', index);
+            $(this).attr('lsindex', $this.cacheLength);
 
-            $this.cache[index] = {
-                attributes: getElementAttributes($(this)),
-                value: $(this).html()
-            };
+            $this.cache[$this.cacheLength] = $this.buildRow($(this));
 
-            index++;
+            $this.cacheLength++;
         });
 
         return $this;
     };
+
+    /**
+     *
+     * @returns {Object}
+     */
+    $this.getObservedElement = function ()
+    {
+        return $this.objects.list;
+    }
+
+    /**
+     *
+     * @param {Object} option
+     * @param {String} mode
+     */
+    $this.notify = function (option, mode)
+    {
+        if (logMessages())
+        {
+            console.log('ListSearch::notify() method called with mode: ' + mode);
+        }
+
+        if (typeof mode !== 'undefined' && mode !== null)
+        {
+            var row = $this.buildRow(option);
+            var rowIndex = null;
+            var cacheUpdated = false;
+
+            // If the option has a row index then we need to update the rowIndex
+            if (isset(row.attributes['lsindex']))
+            {
+                rowIndex = row.attributes['lsindex'];
+            }
+
+            if (mode == 'add')
+            {
+                cacheUpdated = true;
+
+                // This should only happen when moving an unindexed item
+                if (rowIndex == null || typeof rowIndex == 'undefined')
+                {
+                    rowIndex = $this.cacheLength;
+                    row.attributes['lsindex'] = rowIndex;
+                }
+
+                $this.cache[rowIndex] = row;
+                $this.cacheLength++;
+            }
+            else if (mode == 'remove')
+            {
+                if (isset($this.cache[rowIndex]))
+                {
+                    cacheUpdated = true;
+
+                    $this.cache[rowIndex] = null;
+                    delete $this.cache[rowIndex];
+                }
+            }
+
+            if (cacheUpdated === true && $this.params.autoSort === true)
+            {
+                sortOptions($this.objects.list);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param {Object} option
+     * @returns {{attributes: Array, value: String}}
+     */
+    $this.buildRow = function (option)
+    {
+        return {
+            attributes: getElementAttributes(option),
+            value: option.html()
+        };
+    }
 
     /**
      *
@@ -327,25 +419,9 @@ function ListSearch(params)
 
             option.html(row.value);
 
-            $this.applyAttributes(option, row.attributes);
+            setElementAttributes(option, row.attributes);
 
             $this.objects.list.append(option);
-        }
-
-        return $this;
-    };
-
-    /**
-     *
-     * @param {Object} option
-     * @param {Array} attributes
-     * @returns ListSearch
-     */
-    $this.applyAttributes = function (option, attributes)
-    {
-        for (var name in attributes)
-        {
-            option.attr(name, attributes[name]);
         }
 
         return $this;

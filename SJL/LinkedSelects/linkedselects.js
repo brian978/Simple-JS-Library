@@ -21,15 +21,14 @@ function LinkedSelects(params)
     // Closure
     var _this = this;
 
-    this.params = {};
-
     // Defining the available params
-    this.params.selects = null;
-    this.params.buttons = null;
-    this.params.callbacks = {};
-
-    // Defining the available callbacks
-    this.params.callbacks.afterMove = null;
+    this.params = {
+        selects: null,
+        buttons: null,
+        callbacks: {
+            afterMove: null
+        }
+    };
 
     // Links between the selects Array( selectId => linkedSelectObj )
     this.links = [];
@@ -40,11 +39,9 @@ function LinkedSelects(params)
     // Holds the callbacks for each of the selects
     this.callbacks = [];
 
-    // Replacing the class params with the given ones
-    if (typeof params === 'object')
-    {
-        this.params = params;
-    }
+    // Holds the list of observers that need to be notified when options are moved
+    // between the lists
+    this.observers = [];
 
     /**
      * Initializes the object
@@ -64,6 +61,67 @@ function LinkedSelects(params)
             }
         });
     };
+
+    /**
+     *
+     * @param {Object} params
+     * @return LinkedSelects
+     */
+    this.setOptions = function (params)
+    {
+        if (typeof params === 'object')
+        {
+            for (var option in this.params)
+            {
+                if (isset(params[option]))
+                {
+                    this.params[option] = params[option];
+                }
+            }
+        }
+
+        return this;
+    };
+
+    /**
+     *
+     * @param {Object} observer
+     */
+    this.registerObserver = function (observer)
+    {
+        this.observers.push(observer);
+    }
+
+    /**
+     *
+     * @param {Object} element The element that triggered the processClick
+     * @param {Object} option
+     */
+    this.notifyObservers = function (element, option)
+    {
+        for (var index in this.observers)
+        {
+            var observer = this.observers[index];
+            var observedElement = observer.getObservedElement();
+            var linkedId = this.links[element.attr('id')].attr('id');
+            var mode = null;
+
+
+            if (observedElement.attr('id') == element.attr('id'))
+            {
+                mode = 'remove';
+            }
+            else if (observedElement.attr('id') == linkedId)
+            {
+                mode = 'add';
+            }
+
+            if (mode !== null)
+            {
+                observer.notify(option, mode);
+            }
+        }
+    }
 
     /**
      * Links 2 select boxes
@@ -189,12 +247,12 @@ function LinkedSelects(params)
             }
             else
             {
-                if(isset(callbacks.parent))
+                if (isset(callbacks.parent))
                 {
                     this.callbacks[parentId] = callbacks.parent;
                 }
 
-                if(isset(callbacks.child))
+                if (isset(callbacks.child))
                 {
                     this.callbacks[childId] = callbacks.child;
                 }
@@ -223,14 +281,14 @@ function LinkedSelects(params)
         // Event for the parent select
         elements.parent.bind('dblclick', function ()
         {
-            _this.processClick(elements.parent);
+            _this.processClick(elements.parent, 'option:selected', true);
             _this.callCallbacks(elements.parent);
         });
 
         // Event for the child select
         elements.child.bind('dblclick', function ()
         {
-            _this.processClick(elements.child);
+            _this.processClick(elements.child, 'option:selected', true);
             _this.callCallbacks(elements.child);
         });
 
@@ -269,14 +327,14 @@ function LinkedSelects(params)
         // Event for the parent btn
         buttons.parent.bind('click', function ()
         {
-            _this.processClick(_this.buttons[parentId]);
+            _this.processClick(_this.buttons[parentId], 'option:selected', true);
             _this.callCallbacks(_this.buttons[parentId]);
         });
 
         // Event for the child btn
         buttons.child.bind('click', function ()
         {
-            _this.processClick(_this.buttons[childId]);
+            _this.processClick(_this.buttons[childId], 'option:selected', true);
             _this.callCallbacks(_this.buttons[childId]);
         });
 
@@ -310,13 +368,14 @@ function LinkedSelects(params)
     /**
      * Processes the click action
      *
-     * @param {Object} element
+     * @param {Object} element This is the select box from where the processClick was triggered
      * @param {String} findWhat
      * @param {Boolean} doSort
      * @return void
      */
     this.processClick = function (element, findWhat, doSort)
     {
+        // The linkedElement is the select box that is linked to "element"
         var linkedElement = this.links[element.attr('id')];
         var find = findWhat || 'option:selected';
         var sort = isset(doSort) ? doSort : true;
@@ -324,26 +383,21 @@ function LinkedSelects(params)
 
         $(element).find(find).each(function ()
         {
-
             var selectedOption = $(this);
             var optionInnerHtml = selectedOption.html();
 
             if (optionInnerHtml.trim() != '')
             {
-
-                var scrollTop = linkedElement.scrollTop();
-
-                // Removing the selected index from the select box
-                selectedOption.remove();
-
                 // Checking if we know were to move the element
                 linkedElement.append(_this.createOption(optionInnerHtml, _this.getAttributes(selectedOption)));
 
-                // Setting the scroll bar where it should be
-                linkedElement.scrollTop(scrollTop);
-
                 // For a little visual feedback we focus on the select where we moved the elements
                 linkedElement.focus();
+
+                _this.notifyObservers(element, selectedOption);
+
+                // Removing the selected index from the select box
+                selectedOption.remove();
 
                 // Flag so that we do the sorting only once
                 moved = true;
@@ -365,30 +419,7 @@ function LinkedSelects(params)
      */
     this.sortOptions = function (selectBox)
     {
-        var attributes = [];
-        var sortable = [];
-        var text = null;
-        var options = selectBox.find('option');
-        var option = null;
-
-        options.each(function (index)
-        {
-            option = $(this);
-            text = option.html();
-            attributes[text] = _this.getAttributes(option);
-            sortable[index] = text;
-        });
-
-        // Sorting
-        sortable.sort();
-
-        // Rebuilding the option list
-        for (var i in sortable)
-        {
-            text = sortable[i];
-            option = $(options.get(i));
-            option.html(text);
-        }
+        sortOptions(selectBox);
 
         // Logging
         if (logMessages())
@@ -408,13 +439,10 @@ function LinkedSelects(params)
     this.createOption = function (text, attributes)
     {
         // Creating the option
-        var option = $('<option>' + text + '</option>');
+        var option = $(document.createElement('option'));
+        option.html('' + text + '');
 
-        // Moving the attributes
-        for (var nodeName in attributes)
-        {
-            option.attr(nodeName, attributes[nodeName]);
-        }
+        setElementAttributes(option, attributes);
 
         return option;
     };
@@ -440,7 +468,7 @@ function LinkedSelects(params)
     {
         var elementId = element.attr('id');
 
-        if(isset(this.callbacks[elementId]))
+        if (isset(this.callbacks[elementId]))
         {
             if (typeof this.callbacks[elementId] === 'function')
             {
@@ -453,4 +481,7 @@ function LinkedSelects(params)
             }
         }
     };
+
+    // Setting the options here because here we have the function available
+    this.setOptions(params);
 }

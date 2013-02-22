@@ -99,7 +99,8 @@ function logMessages()
             )
             || !isset(window.enableLogging)
         )
-    ) {
+        )
+    {
         return true;
     }
 
@@ -116,7 +117,7 @@ function getElementType(element)
 {
     var result = '';
 
-    if(element instanceof jQuery)
+    if (element instanceof jQuery)
     {
         result = new String(element.get(0).tagName).toLowerCase();
     }
@@ -134,7 +135,7 @@ function getElementAttributes(element)
 {
     var attributes = [];
 
-    if(element instanceof jQuery)
+    if (element instanceof jQuery)
     {
         var nodeMap = element[0].attributes;
 
@@ -148,4 +149,59 @@ function getElementAttributes(element)
     }
 
     return attributes;
+}
+
+/**
+ * Sets a list of attributes to an element
+ *
+ * @param {Object} element
+ * @param {Array} attributes
+ */
+function setElementAttributes(element, attributes)
+{
+    if (element instanceof jQuery)
+    {
+        for (var name in attributes)
+        {
+            element.attr(name, attributes[name]);
+        }
+    }
+}
+
+/**
+ * Sorts the options from a list box by their HTML value (the one the user sees)
+ *
+ * @param selectBox
+ */
+function sortOptions(selectBox)
+{
+    if (selectBox instanceof jQuery)
+    {
+        var attributes = [];
+        var sortable = [];
+        var text = null;
+        var options = selectBox.find('option');
+        var option = null;
+
+        options.each(function (index)
+        {
+            option = $(this);
+            text = option.html();
+            attributes[text] = getElementAttributes(option);
+            sortable[index] = text;
+        });
+
+        // Sorting
+        sortable.sort();
+
+        // Rebuilding the option list
+        for (var i in sortable)
+        {
+            text = sortable[i];
+            option = $(options.get(i));
+            option.html(text);
+
+            setElementAttributes(option, attributes[text]);
+        }
+    }
 }
