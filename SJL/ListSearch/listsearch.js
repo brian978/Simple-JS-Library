@@ -6,7 +6,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name ListSearch
- * @version 1.3.1
+ * @version 1.3.3
  *
  */
 
@@ -54,6 +54,11 @@ function ListSearch(params)
         search: null,
         clear: null
     };
+
+    // The flag determins if this object is observed by another one
+    // because if that is the case, the options need to be sorted when showing
+    // the results
+    $this.observedObject = false;
 
     /**
      *
@@ -189,8 +194,6 @@ function ListSearch(params)
         $this.objects.search.val('');
         $this.showResults($this.cache);
 
-        sortOptions($this.objects.list);
-
         return $this;
     };
 
@@ -268,6 +271,8 @@ function ListSearch(params)
             console.log('ListSearch::notify() method called with mode: ' + mode);
         }
 
+        $this.observedObject = true;
+
         if (typeof mode !== 'undefined' && mode !== null)
         {
             var row = $this.buildRow(option);
@@ -303,11 +308,6 @@ function ListSearch(params)
                     $this.cache[rowIndex] = null;
                     delete $this.cache[rowIndex];
                 }
-            }
-
-            if (cacheUpdated === true && $this.params.autoSort === true)
-            {
-                sortOptions($this.objects.list);
             }
         }
     }
@@ -422,6 +422,11 @@ function ListSearch(params)
             setElementAttributes(option, row.attributes);
 
             $this.objects.list.append(option);
+        }
+
+        if ($this.observedObject === true && $this.params.autoSort === true)
+        {
+            sortOptions($this.objects.list);
         }
 
         return $this;

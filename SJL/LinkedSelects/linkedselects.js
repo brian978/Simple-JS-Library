@@ -6,7 +6,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name LinkedSelects
- * @version 1.4.2
+ * @version 1.4.4
  *
  */
 
@@ -388,8 +388,14 @@ function LinkedSelects(params)
 
             if (optionInnerHtml.trim() != '')
             {
+                // The scrollTop might not work in all the browsers
+                var scrollTop = linkedElement.scrollTop();
+
                 // Checking if we know were to move the element
                 linkedElement.append(_this.createOption(optionInnerHtml, _this.getAttributes(selectedOption)));
+
+                // Setting the scroll bar where it should be
+                linkedElement.scrollTop(scrollTop);
 
                 // For a little visual feedback we focus on the select where we moved the elements
                 linkedElement.focus();
