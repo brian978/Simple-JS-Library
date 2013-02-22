@@ -23,7 +23,7 @@ function Action(){
      * Used to register the last action
      *
      * @param {Object} objInstance
-     * @param {String} methodName
+     * @param methodName
      * @param {Array} params
      * @return object
      */
