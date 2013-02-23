@@ -177,31 +177,39 @@ function sortOptions(selectBox)
 {
     if (selectBox instanceof jQuery)
     {
-        var attributes = [];
+        var elements = {};
         var sortable = [];
         var text = null;
         var options = selectBox.find('option');
-        var option = null;
+        var htmlOptions = [];
 
         options.each(function (index)
         {
-            option = $(this);
-            text = option.html();
-            attributes[text] = getElementAttributes(option);
-            sortable[index] = text;
+            sortable.push(index);
+            elements[index] = {
+                attributes: getElementAttributes($(this)),
+                text: $(this).html()
+            };
         });
 
-        // Sorting
-        sortable.sort();
+        sortable.sort(function(a, b)
+        {
+            return elements[a].text.localeCompare(elements[b].text);
+        });
 
         // Rebuilding the option list
         for (var i in sortable)
         {
-            text = sortable[i];
-            option = $(options.get(i));
-            option.html(text);
+            var index = sortable[i];
+            var option = $(options.get(index));
+            option.html(elements[index].text);
+            setElementAttributes(option, elements[index].attributes);
 
-            setElementAttributes(option, attributes[text]);
+            // We need the string representation of the option
+            // so we can use it later to add them to the selectBox
+            htmlOptions.push(option.get(0).outerHTML);
         }
+
+        selectBox.html(htmlOptions.join(''));
     }
 }
