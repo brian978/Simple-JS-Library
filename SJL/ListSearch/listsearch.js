@@ -1,19 +1,18 @@
 /**
  *
  * @author Brian
- * @link https://github.com/brian978
- * @copyright 2012
+ * @see https://github.com/brian978
+ * @copyright 2013
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name ListSearch
- * @version 1.3.3
+ * @version 1.3.4
  *
  */
 
 /**
  *
  * @param {Object} params
- * @returns {{init: Function, refresh: Function}}
  * @constructor
  */
 function ListSearch(params)
@@ -257,7 +256,7 @@ function ListSearch(params)
     $this.getObservedElement = function ()
     {
         return $this.objects.list;
-    }
+    };
 
     /**
      *
@@ -277,7 +276,6 @@ function ListSearch(params)
         {
             var row = $this.buildRow(option);
             var rowIndex = null;
-            var cacheUpdated = false;
 
             // If the option has a row index then we need to update the rowIndex
             if (isset(row.attributes['lsindex']))
@@ -287,8 +285,6 @@ function ListSearch(params)
 
             if (mode == 'add')
             {
-                cacheUpdated = true;
-
                 // This should only happen when moving an unindexed item
                 if (rowIndex == null || typeof rowIndex == 'undefined')
                 {
@@ -303,14 +299,14 @@ function ListSearch(params)
             {
                 if (isset($this.cache[rowIndex]))
                 {
-                    cacheUpdated = true;
-
                     $this.cache[rowIndex] = null;
                     delete $this.cache[rowIndex];
                 }
             }
         }
-    }
+
+        return $this;
+    };
 
     /**
      *
@@ -323,7 +319,7 @@ function ListSearch(params)
             attributes: getElementAttributes(option),
             value: option.html()
         };
-    }
+    };
 
     /**
      *

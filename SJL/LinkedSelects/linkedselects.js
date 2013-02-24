@@ -1,12 +1,12 @@
 /**
  *
  * @author Brian
- * @link https://github.com/brian978
- * @copyright 2012
+ * @see https://github.com/brian978
+ * @copyright 2013
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name LinkedSelects
- * @version 1.4.4
+ * @version 1.4.5
  *
  */
 
@@ -14,7 +14,6 @@
  * The class is used to link 2 select boxes together
  *
  * @param {Object} params
- * @return void
  */
 function LinkedSelects(params)
 {
@@ -43,10 +42,13 @@ function LinkedSelects(params)
     // between the lists
     this.observers = [];
 
+    // A list of moved options that will be passed to the callbacks
+    this.movedOptions = [];
+
     /**
      * Initializes the object
      *
-     * @return void
+     * @returns LinkedSelects
      */
     this.init = function ()
     {
@@ -60,12 +62,14 @@ function LinkedSelects(params)
                 }
             }
         });
+
+        return this;
     };
 
     /**
      *
      * @param {Object} params
-     * @return LinkedSelects
+     * @returns LinkedSelects
      */
     this.setOptions = function (params)
     {
@@ -86,11 +90,14 @@ function LinkedSelects(params)
     /**
      *
      * @param {Object} observer
+     * @returns LinkedSelects
      */
     this.registerObserver = function (observer)
     {
         this.observers.push(observer);
-    }
+
+        return this;
+    };
 
     /**
      *
@@ -121,14 +128,14 @@ function LinkedSelects(params)
                 observer.notify(option, mode);
             }
         }
-    }
+    };
 
     /**
      * Links 2 select boxes
      *
      * @param {Object} elements
-     * @param {Integer} index
-     * @return void
+     * @param {Number} index
+     * @returns void
      */
     this.setupSelects = function (elements, index)
     {
@@ -183,7 +190,7 @@ function LinkedSelects(params)
      *
      * @param {Object} buttons
      * @param {Object} elements
-     * @return void
+     * @returns void
      */
     this.setupButtons = function (buttons, elements)
     {
@@ -230,7 +237,7 @@ function LinkedSelects(params)
      *
      * @param {Object} callbacks
      * @param {Object} elements
-     * @return void
+     * @returns void
      */
     this.setupCallbacks = function (callbacks, elements)
     {
@@ -274,7 +281,7 @@ function LinkedSelects(params)
      * Sets up the event handlers
      *
      * @param {Object} elements
-     * @return void
+     * @returns void
      */
     this.setupSelectEvents = function (elements)
     {
@@ -317,7 +324,7 @@ function LinkedSelects(params)
      * Sets up the event handlers for the buttons
      *
      * @param {Object} buttons
-     * @return void
+     * @returns void
      */
     this.setupButtonEvents = function (buttons)
     {
@@ -371,15 +378,19 @@ function LinkedSelects(params)
      * @param {Object} element This is the select box from where the processClick was triggered
      * @param {String} findWhat
      * @param {Boolean} doSort
-     * @return void
+     * @returns void
      */
     this.processClick = function (element, findWhat, doSort)
     {
         // The linkedElement is the select box that is linked to "element"
         var linkedElement = this.links[element.attr('id')];
         var find = findWhat || 'option:selected';
-        var sort = isset(doSort) ? doSort : true;
+        var sort = typeof doSort !== 'undefined' ? doSort : true;
         var moved = false;
+
+        // The moved options need to be reset before each move
+        // to avoid wrong data
+        this.movedOptions = [];
 
         $(element).find(find).each(function ()
         {
@@ -407,6 +418,9 @@ function LinkedSelects(params)
 
                 // Flag so that we do the sorting only once
                 moved = true;
+
+                // Registering the moved option
+                _this.movedOptions.push(selectedOption)
             }
         });
 
@@ -421,7 +435,7 @@ function LinkedSelects(params)
      * Sorts the options of an element
      *
      * @param {Object} selectBox
-     * @return void
+     * @returns void
      */
     this.sortOptions = function (selectBox)
     {
@@ -440,7 +454,7 @@ function LinkedSelects(params)
      *
      * @param {String} text
      * @param {Array} attributes
-     * @return object
+     * @returns object
      */
     this.createOption = function (text, attributes)
     {
@@ -457,7 +471,7 @@ function LinkedSelects(params)
      * The method retrieves all the attributes of an element
      *
      * @param {Object} element
-     * @return Array
+     * @returns Array
      */
     this.getAttributes = function (element)
     {
@@ -468,7 +482,7 @@ function LinkedSelects(params)
      * The method calls the given callback (if there is one of course)
      *
      * @param {Object} element
-     * @return void
+     * @returns void
      */
     this.callCallbacks = function (element)
     {
@@ -478,12 +492,22 @@ function LinkedSelects(params)
         {
             if (typeof this.callbacks[elementId] === 'function')
             {
-                this.callbacks[elementId]();
+                this.callbacks[elementId](this.movedOptions);
             }
             // Support for callbacks build with the Action object
             else if (this.callbacks[elementId] instanceof Action)
             {
-                this.callbacks[elementId].execute();
+                var action = this.callbacks[elementId];
+                var params = action.get();
+
+                params.push(this.movedOptions);
+                action.set(params);
+                action.execute();
+
+                // Arrays are passed by reference
+                // so we need to remove the added element
+                params.pop();
+                action.set(params);
             }
         }
     };
