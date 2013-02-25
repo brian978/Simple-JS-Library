@@ -110,17 +110,16 @@ function LinkedSelects(params)
         {
             var observer = this.observers[index];
             var observedElement = observer.getObservedElement();
+            var elementId = element.attr('id');
             var mode = null;
 
 
-            if (observedElement.attr('id') == element.attr('id'))
+            if (observedElement.attr('id') == elementId)
             {
                 mode = 'remove';
             }
             else
             {
-                var elementId = element.attr('id');
-
                 if(isset(this.links[elementId]))
                 {
                     var linkedId = this.links[elementId].attr('id');
