@@ -110,7 +110,6 @@ function LinkedSelects(params)
         {
             var observer = this.observers[index];
             var observedElement = observer.getObservedElement();
-            var linkedId = this.links[element.attr('id')].attr('id');
             var mode = null;
 
 
@@ -118,9 +117,19 @@ function LinkedSelects(params)
             {
                 mode = 'remove';
             }
-            else if (observedElement.attr('id') == linkedId)
+            else
             {
-                mode = 'add';
+                var elementId = element.attr('id');
+
+                if(isset(this.links[elementId]))
+                {
+                    var linkedId = this.links[elementId].attr('id');
+
+                    if (observedElement.attr('id') == linkedId)
+                    {
+                        mode = 'add';
+                    }
+                }
             }
 
             if (mode !== null)
