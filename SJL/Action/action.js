@@ -57,7 +57,7 @@ function Action()
      */
     this.set = function (params)
     {
-        if (typeof params !== 'undefined')
+        if (typeof params == 'object' && params instanceof Array)
         {
             this.params = params;
 

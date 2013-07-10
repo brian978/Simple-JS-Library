@@ -245,7 +245,7 @@ function InfiniteScroll(params){
             // Creating the AjaxCaller object
             var sender = new DataSender({
                 url:                this.params.url,
-                postReceiveAction:  new Action(_this, 'pullContent'),
+                postReceiveAction:  new Action().register(_this, 'pullContent', []),
                 loadingScreen:      false,
                 data:               this.params.data,
                 inspectResponse:    this.params.inspectResponse,
