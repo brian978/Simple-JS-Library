@@ -125,7 +125,7 @@ function HashHandler()
      */
     this.add = function (index, value, isArray)
     {
-        if (typeof index == 'string' && typeof value == 'string') {
+        if (typeof index == 'string' && (typeof value == 'string' || typeof value == 'number')) {
             if (typeof isArray != 'undefined' && isArray === true) {
                 this.addInArray(index, value);
             } else {
