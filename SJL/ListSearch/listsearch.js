@@ -68,20 +68,17 @@ function ListSearch(params)
         var allOk = true;
         var id;
 
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::init() method called');
         }
 
         // Creating the required objects
-        for (id in $this.requiredIds)
-        {
+        for (id in $this.requiredIds) {
             var objectIdentifier = $this.requiredIds[id];
 
             $this.objects[objectIdentifier] = $('#' + $this.params[id]);
 
-            if ($this.objects[objectIdentifier].length == 0)
-            {
+            if ($this.objects[objectIdentifier].length == 0) {
                 alert('The object for the ID ' + id + ' was not found');
 
                 allOk = false;
@@ -89,18 +86,15 @@ function ListSearch(params)
         }
 
         // Creating the optional objects
-        for (id in $this.optionalIds)
-        {
+        for (id in $this.optionalIds) {
             var object = $('#' + $this.params[id]);
 
-            if (object.length != 0)
-            {
+            if (object.length != 0) {
                 $this.objects[$this.optionalIds[id]] = object;
             }
         }
 
-        if (allOk == true)
-        {
+        if (allOk == true) {
             $this.buildCache();
             $this.bindEvents();
         }
@@ -115,12 +109,9 @@ function ListSearch(params)
      */
     $this.setOptions = function (params)
     {
-        if (typeof params === 'object')
-        {
-            for (var option in $this.params)
-            {
-                if (isset(params[option]))
-                {
+        if (typeof params === 'object') {
+            for (var option in $this.params) {
+                if (isset(params[option])) {
                     $this.params[option] = params[option];
                 }
             }
@@ -135,8 +126,7 @@ function ListSearch(params)
      */
     $this.refresh = function ()
     {
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::refresh() method called');
         }
 
@@ -154,16 +144,14 @@ function ListSearch(params)
      */
     $this.bindEvents = function ()
     {
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::bindEvents() method called');
         }
 
         // Search box
         $this.objects.search.bind('keyup', function ()
         {
-            if ($this.timeoutId !== null)
-            {
+            if ($this.timeoutId !== null) {
                 clearTimeout($this.timeoutId);
             }
 
@@ -171,8 +159,7 @@ function ListSearch(params)
         });
 
         // Clear button
-        if ($this.objects.clear !== null)
-        {
+        if ($this.objects.clear !== null) {
             $this.objects.clear.bind('click', function ()
             {
                 $this.clearSearch();
@@ -203,8 +190,7 @@ function ListSearch(params)
      */
     $this.initDamper = function (searchValue)
     {
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::initDamper() method called');
         }
 
@@ -225,13 +211,11 @@ function ListSearch(params)
      */
     $this.buildCache = function ()
     {
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::buildCache() method called');
         }
 
-        if ($this.params.autoSort === true)
-        {
+        if ($this.params.autoSort === true) {
             sortOptions($this.objects.list);
         }
 
@@ -265,29 +249,24 @@ function ListSearch(params)
      */
     $this.notify = function (option, mode)
     {
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::notify() method called with mode: ' + mode);
         }
 
         $this.observedObject = true;
 
-        if (typeof mode !== 'undefined' && mode !== null)
-        {
+        if (typeof mode !== 'undefined' && mode !== null) {
             var row = $this.buildRow(option);
             var rowIndex = null;
 
             // If the option has a row index then we need to update the rowIndex
-            if (isset(row.attributes['lsindex']))
-            {
+            if (isset(row.attributes['lsindex'])) {
                 rowIndex = row.attributes['lsindex'];
             }
 
-            if (mode == 'add')
-            {
+            if (mode == 'add') {
                 // This should only happen when moving an unindexed item
-                if (rowIndex == null || typeof rowIndex == 'undefined')
-                {
+                if (rowIndex == null || typeof rowIndex == 'undefined') {
                     rowIndex = $this.cacheLength;
                     row.attributes['lsindex'] = rowIndex;
                 }
@@ -295,10 +274,8 @@ function ListSearch(params)
                 $this.cache[rowIndex] = row;
                 $this.cacheLength++;
             }
-            else if (mode == 'remove')
-            {
-                if (isset($this.cache[rowIndex]))
-                {
+            else if (mode == 'remove') {
+                if (isset($this.cache[rowIndex])) {
                     $this.cache[rowIndex] = null;
                     delete $this.cache[rowIndex];
                 }
@@ -328,8 +305,7 @@ function ListSearch(params)
      */
     $this.doSearch = function (value)
     {
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::doSearch() method called');
         }
 
@@ -345,8 +321,7 @@ function ListSearch(params)
      */
     $this.searchCache = function (value)
     {
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::searchCache() method called');
             console.log('Searching for: ' + value);
         }
@@ -357,10 +332,8 @@ function ListSearch(params)
         var regex = new RegExp('^' + value, 'i');
 
         // Searching the words that start with the desired characters
-        for (index in localCache)
-        {
-            if (localCache[index].value.search(regex) != -1)
-            {
+        for (index in localCache) {
+            if (localCache[index].value.search(regex) != -1) {
                 results[index] = localCache[index];
 
                 // We need to remove the row from the local cache to avoid
@@ -368,8 +341,7 @@ function ListSearch(params)
                 localCache[index] = null;
                 delete localCache[index];
 
-                if (logMessages())
-                {
+                if (logMessages()) {
                     console.log('Result found: ' + results[index].value);
                 }
             }
@@ -378,14 +350,11 @@ function ListSearch(params)
         regex = new RegExp(value, 'i');
 
         // Searching everywhere
-        for (index in localCache)
-        {
-            if (localCache[index].value.search(regex) != -1)
-            {
+        for (index in localCache) {
+            if (localCache[index].value.search(regex) != -1) {
                 results[index] = localCache[index];
 
-                if (logMessages())
-                {
+                if (logMessages()) {
                     console.log('Result found (match everywhere): ' + results[index].value);
                 }
             }
@@ -401,15 +370,13 @@ function ListSearch(params)
      */
     $this.showResults = function (results)
     {
-        if (logMessages())
-        {
+        if (logMessages()) {
             console.log('ListSearch::showResults() method called');
         }
 
         $this.objects.list.html('');
 
-        for (var index in results)
-        {
+        for (var index in results) {
             var row = results[index];
             var option = $(document.createElement('option'));
 
@@ -420,8 +387,7 @@ function ListSearch(params)
             $this.objects.list.append(option);
         }
 
-        if ($this.observedObject === true && $this.params.autoSort === true)
-        {
+        if ($this.observedObject === true && $this.params.autoSort === true) {
             sortOptions($this.objects.list);
         }
 
