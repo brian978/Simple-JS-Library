@@ -105,7 +105,7 @@ function HashHandler()
         var value = '';
 
         if (typeof indexName == 'string' && isset(this.values[indexName])) {
-            if (typeof indexValue == 'string' && indexValue.length > 0 && typeof this.values[indexName] == 'object' && isset(this.values[indexName][indexValue])) {
+            if (((typeof indexValue == 'string' && indexValue.length > 0) || typeof indexValue == 'number') && typeof this.values[indexName] == 'object' && isset(this.values[indexName][indexValue])) {
                 value = this.values[indexName][indexValue];
             } else {
                 value = this.values[indexName];
