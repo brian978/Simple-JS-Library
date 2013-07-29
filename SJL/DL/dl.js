@@ -3,7 +3,7 @@
  * The class simply loads the required files for the framework to load
  *
  * @author Brian
- * @link https://github.com/brian978
+ * @link https://github.com/brian978/Simple-JS-Library
  * @copyright 2012
  * @license Creative Commons Attribution-ShareAlike 3.0
  *

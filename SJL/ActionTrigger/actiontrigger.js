@@ -3,7 +3,7 @@
  * A class that triggeres a set action when a set container changes it's state
  *
  * @author Brian
- * @link https://github.com/brian978
+ * @link https://github.com/brian978/Simple-JS-Library
  * @copyright 2013
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
