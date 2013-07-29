@@ -8,7 +8,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  *
  * @name HashHandler
- * @version 1.0
+ * @version 1.1
  *
  */
 
