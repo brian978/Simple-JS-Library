@@ -189,7 +189,7 @@ function HashHandler()
     this.remove = function (index, value)
     {
         if (typeof index == 'string' && isset(this.values[index])) {
-            if (typeof this.values[index] == 'object' && typeof value == 'string') {
+            if (typeof this.values[index] == 'object' && (typeof value == 'string' || typeof value == 'number')) {
                 for (var valueIndex in this.values[index]) {
                     if (this.values[index][valueIndex] == value) {
                         this.values[index][valueIndex] = null;
